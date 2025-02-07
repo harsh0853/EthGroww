@@ -117,9 +117,9 @@ const Login = () => {
         email: loginData.email,
         password: loginData.password,
       });
-
-      localStorage.setItem("userToken", res.data.token);
-      localStorage.setItem("ethAddress", res.data.ethAddress);
+      console.log(res);
+      localStorage.setItem("userToken", res.data.data.accessToken);
+      localStorage.setItem("ethAddress", res.data.data.user.ethAddress);
       setIsLoading(false);
       setTimeout(() => {
         navigate("/"); // Navigate after UI updates

@@ -10,15 +10,27 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// ✅ Correct way to import JSON in ESM
+import contractABI from "./contractABI.json" assert { type: "json" };
+
 // Blockchain Setup
+const mnemonicPhrase = process.env.MNEMONIC;
+if (!mnemonicPhrase) {
+  throw new Error("MNEMONIC is not defined in the .env file");
+}
+
+const mnemonic = ethers.Mnemonic.fromPhrase(mnemonicPhrase);
+const wallet = ethers.HDNodeWallet.fromMnemonic(mnemonic);
 const provider = new ethers.JsonRpcProvider(process.env.INFURA_URL);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-const contractABI = require("./contractABI.json"); // Ensure ABI file is in backend
+const signer = wallet.connect(provider);
+
 const contract = new ethers.Contract(
   process.env.CONTRACT_ADDRESS,
   contractABI,
-  wallet
+  signer
 );
+
+console.log("Wallet Address:", signer.address);
 
 // Generate unique Loan ID
 const generateNanoId = () => nanoid(12);
@@ -32,18 +44,21 @@ function calculateInterestRate(principal, durationInYears, creditScore) {
 
 // 1️⃣ CREATE LOAN (Borrower requests a loan)
 const createLoan = asyncHandler(async (req, res) => {
-  const { amount, time } = req.body;
-  const userId = req._id;
+  const { amount, duration, ethAddress } = req.body;
 
-  const user = await User.findById(userId);
-  if (!user) throw new ApiError(404, "User not found");
-  if (!amount || !time) throw new ApiError(400, "All fields are required");
+  // 🔹 Check if `ethAddress` is provided
+  if (!ethAddress) throw new ApiError(400, "Ethereum address is required.");
+  console.log(ethAddress);
+  // 🔹 Find the user using `ethAddress`
+  const user = await User.findOne({ ethAddress });
+  if (!user) throw new ApiError(404, "User not found.");
+  if (!amount || !duration) throw new ApiError(400, "All fields are required");
 
   // Create loan on Blockchain
   const tx = await contract.requestLoan(
     ethers.parseEther(amount.toString()),
-    calculateInterestRate(amount, time / 365, user.creditScore),
-    time
+    calculateInterestRate(amount, duration / 365, user.creditScore),
+    duration
   );
   await tx.wait();
 
@@ -55,7 +70,7 @@ const createLoan = asyncHandler(async (req, res) => {
     loanId: loanId.toString(),
     borrowerEthAddress: user.ethAddress,
     loanAmount: amount,
-    time: time,
+    time: duration,
   });
 
   return res

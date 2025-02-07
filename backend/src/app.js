@@ -19,11 +19,13 @@ app.use(cookieParser()); // to get access and set cookies of the client's browse
 
 //routes import
 import userRouter from "../routes/user.routes.js";
+import feedRouter from "../routes/feed.routes.js";
 //import contactRouter from "../routes/contact.routes.js";
 
 //import feedRouter from "../routes/feed.routes.js";
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/feed", feedRouter);
 //app.use("/api/v1/users", contactRouter)
 
 export { app };

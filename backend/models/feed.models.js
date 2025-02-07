@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Loan from "./loan.models.js";
+import { Loan } from "./loan.models.js";
 
 const feedSchema = new mongoose.Schema(
   {
