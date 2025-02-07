@@ -19,15 +19,9 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
     },
-    fullName: {
-      type: String,
-      required: true,
-      trim: true,
-      index: true, //for searching
-    },
+
     avatar: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
