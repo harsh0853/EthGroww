@@ -1,137 +1,180 @@
 import { User } from "../models/user.models.js";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler.js";
 import { Loan } from "../models/loan.models.js";
-import { nanoid } from "nanoid"
 import { Feed } from "../models/feed.models.js";
+import { nanoid } from "nanoid";
+import { ethers } from "ethers";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import dotenv from "dotenv";
 
-const generateNanoId = () => {
-    return nanoid(12); // Generates a short, unique ID (12 characters)
-};
+dotenv.config();
 
+// Blockchain Setup
+const provider = new ethers.JsonRpcProvider(process.env.INFURA_URL);
+const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+const contractABI = require("./contractABI.json"); // Ensure ABI file is in backend
+const contract = new ethers.Contract(
+  process.env.CONTRACT_ADDRESS,
+  contractABI,
+  wallet
+);
+
+// Generate unique Loan ID
+const generateNanoId = () => nanoid(12);
+
+// Function to calculate interest dynamically
 function calculateInterestRate(principal, durationInYears, creditScore) {
-    let baseRate;
-
-   
-    if (creditScore >= 750) baseRate = 4;  // 4% for high credit score
-    else if (creditScore >= 650) baseRate = 6;  // 6% for medium score
-    else baseRate = 10;  // 10% for low score
-
-    // Extra interest for long-term loans (> 1 year)
-    let extraInterest = durationInYears > 1 ? (2 * (durationInYears - 1)) : 0;
-
-    let finalRate = baseRate + extraInterest;
-
-    return finalRate;
+  let baseRate = creditScore >= 750 ? 4 : creditScore >= 650 ? 6 : 10;
+  let extraInterest = durationInYears > 1 ? 2 * (durationInYears - 1) : 0;
+  return baseRate + extraInterest;
 }
 
+// 1️⃣ CREATE LOAN (Borrower requests a loan)
+const createLoan = asyncHandler(async (req, res) => {
+  const { amount, time } = req.body;
+  const userId = req._id;
 
-const createLoan = asyncHandler(async (req, res)=>{
-    const {amount, time} = req.body;
-    const userId = req._id;
-    // if(!user){
-    //     throw ApiError(401, "Unauthorized error")
-    // }
-    const user = await User.findById(userId)
-    if(!user){
-        throw new ApiError(404, "User not found");
-    }
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(404, "User not found");
+  if (!amount || !time) throw new ApiError(400, "All fields are required");
 
-    if((!amount) || (!time)){
-        throw new ApiError(400, "All fields are required")
-    }
-    const uniId = generateNanoId();
+  // Create loan on Blockchain
+  const tx = await contract.requestLoan(
+    ethers.parseEther(amount.toString()),
+    calculateInterestRate(amount, time / 365, user.creditScore),
+    time
+  );
+  await tx.wait();
 
-    const newLoan = await Loan.create({
-        uniqueId: uniId,
-        borrowerEthAddress: user.ethAddress,
-        loanAmount: amount,
-        time: time
-    })
+  const loanId = await contract.loanCounter(); // Fetch latest Loan ID from blockchain
 
-    if(!newLoan){
-        throw new ApiError(500, "Something went wrong")
-    }
+  // Store loan details in MongoDB
+  const newLoan = await Loan.create({
+    uniqueId: generateNanoId(),
+    loanId: loanId.toString(),
+    borrowerEthAddress: user.ethAddress,
+    loanAmount: amount,
+    time: time,
+  });
 
-    return res.status(201).json(
-        new ApiResponse(200, newLoan, "Loan request created successfully")
-    )
+  return res
+    .status(201)
+    .json(new ApiResponse(200, newLoan, "Loan request created successfully"));
+});
 
-})
+// 2️⃣ FUND LOAN (Lender funds a loan)
+const loanFunded = asyncHandler(async (req, res) => {
+  const { loanId, amount } = req.body;
+  const userId = req._id;
 
+  const lender = await User.findById(userId);
+  if (!lender) throw new ApiError(404, "Lender not found");
 
+  const loan = await Loan.findOne({ loanId });
+  if (!loan) throw new ApiError(404, "Loan not found");
 
-const loanFunded = asyncHandler(async (req, res)=> {
-    const userId = req.params;
-    const {uniId} = req.body
-    if(!userId) throw new ApiError(404, "userId not found");
-    if(!uniId) throw new ApiError(404, "uniId not found");
+  // Fund loan on Blockchain
+  const tx = await contract.fundLoan(loanId, {
+    value: ethers.parseEther(amount.toString()),
+  });
+  await tx.wait();
 
-    const user = await User.findById(userId)
-    if(!user){
-        throw new ApiError(404, "User doesn't exist")
-    }
-    
-    const lenderEthAddress = user.ethAddress;
+  // Store funding details in MongoDB
+  await Feed.create({
+    borrowerAddress: loan.borrowerEthAddress,
+    lenderAddress: lender.ethAddress,
+    loanId: loanId,
+    amount: loan.loanAmount,
+    time: loan.time,
+    isFunded: true,
+    isRepaid: false,
+  });
 
-    const findUniId = Loan.findOne({
-        uniqueId:uniId
-    })
+  return res
+    .status(201)
+    .json(new ApiResponse(200, "Loan funded successfully!"));
+});
 
-    if(!findUniId) throw new ApiError(404, "uniqueId not found");
+// 3️⃣ REPAY LOAN (Borrower repays the loan)
+const loanRepaid = asyncHandler(async (req, res) => {
+  const { loanId, amount } = req.body;
+  const userId = req._id;
 
-    const brwEthAdd = findUniId.borrowerEthAddress;
-    const credit = await User.findOne({
-        ethAddress: brwEthAdd
-    })
-    if(!credit) throw new ApiError(404, "not found")
-    
-    const creditScore = credit.creditScore;
+  const borrower = await User.findById(userId);
+  if (!borrower) throw new ApiError(404, "Borrower not found");
 
+  const loan = await Loan.findOne({ loanId });
+  if (!loan) throw new ApiError(404, "Loan not found");
 
-    const interestRate = calculateInterestRate(findUniId.amount, findUniId.time, creditScore);
+  // Repay loan on Blockchain
+  const tx = await contract.repayLoan(loanId, {
+    value: ethers.parseEther(amount.toString()),
+  });
+  await tx.wait();
 
-    const newFeed = await Feed.create({
-        borrowerAddress: findUniId.borrowerEthAddress,
-        lenderAddress: lenderEthAddress,
-        loanId: findUniId._id,
-        amount: findUniId.amount,
-        time: findUniId.time,
-        interest: interestRate,
-        isFunded: true,
-        isRepaid: false,
-    
-    })
+  // Update MongoDB to reflect repayment
+  loan.isRepaid = true;
+  await loan.save();
 
-    if(!newFeed){
-        throw new ApiError(500, "Something went wrong")
-    }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Loan repaid successfully!"));
+});
 
-    return res.status(201).json(
-        new ApiResponse(200, "Loan funded successfully!")
-    )
+// 4️⃣ GET LOAN DETAILS
+const getLoanDetails = asyncHandler(async (req, res) => {
+  const { loanId } = req.params;
+  const loan = await contract.loans(loanId);
 
-})
+  if (!loan) throw new ApiError(404, "Loan not found");
 
-const loanRepaid = asyncHandler(async (req, res)=>{
+  res.json({
+    borrower: loan.borrower,
+    lender: loan.lender,
+    amount: ethers.formatEther(loan.amount),
+    interestRate: loan.interestRate,
+    duration: loan.duration,
+    isFunded: loan.isFunded,
+    isRepaid: loan.isRepaid,
+    isDefaulted: loan.isDefaulted,
+  });
+});
 
-    try {
-        const {loanId} = req.body;
+// 5️⃣ GET ALL LOANS
+const getAllLoans = asyncHandler(async (req, res) => {
+  try {
+    const loans = await Loan.find(
+      {},
+      "loanId loanAmount time borrowerEthAddress"
+    );
 
-        if(!loanId) throw new ApiError(404, "loanId not found")
-        
-        const findLoanId = await Loan.findById()
+    if (!loans.length) throw new ApiError(404, "No loans found");
 
+    // Fetch borrower's credit score from User DB
+    const formattedLoans = await Promise.all(
+      loans.map(async (loan) => {
+        const user = await User.findOne(
+          { ethAddress: loan.borrowerEthAddress },
+          "creditScore"
+        );
+        return {
+          loanId: loan.loanId,
+          loanAmount: loan.loanAmount,
+          time: loan.time,
+          creditScore: user ? user.creditScore : "Not Available",
+        };
+      })
+    );
 
-        const tx = await contract.repayLoan(loanId, { value: ethers.parseEther(amount.toString()) });
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, formattedLoans, "All loans retrieved successfully")
+      );
+  } catch (error) {
+    return res.status(500).json(new ApiError(500, error.message));
+  }
+});
 
-        await tx.wait();
-        res.json({ message: "Loan Repaid Successfully", transaction: tx.hash });
-    } catch (error) {
-        res.status(500).json({ error: error.reason || error.message});
-    }
-})
-
-
-export {createLoan, loanFunded}
+export { createLoan, loanFunded, loanRepaid, getLoanDetails, getAllLoans };
