@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -10,10 +10,9 @@ import {
   ListItemButton,
   Button,
   ListItemText,
-  IconButton,
 } from "@mui/material";
 import DrawerItem from "./DrawerItem";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { keyframes } from "@mui/material/styles";
 
 const shake = keyframes`
@@ -24,12 +23,12 @@ const shake = keyframes`
   100% { transform: translateX(0); }
 `;
 
-const StyledLoginButton = styled(Button)(({ theme }) => ({
-  marginLeft: theme.spacing(3),
+const StyledButton = styled(Button)(({ theme }) => ({
+  marginLeft: theme.spacing(2),
   color: "#fff",
   border: "1px solid #fff",
   borderRadius: "15px",
-  padding: "12px",
+  padding: "10px 15px",
   transition: "all 0.3s ease-in-out",
   "&:hover": {
     animation: `${shake} 0.3s ease-in-out`,
@@ -51,33 +50,24 @@ const ListMenu = styled(List)(({ theme }) => ({
   },
 }));
 
-//rotas
-const itemList = [
-  {
-    text: "Home",
-    to: "/",
-  },
-  {
-    text: "About",
-    to: "/about",
-  },
-  {
-    text: "Feed",
-    to: "/feed",
-  },
-  {
-    text: "Contact",
-    to: "/contact",
-  },
-];
-
 const Navbar = () => {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
-  const handleProfileClick = (e) => {
-    e.preventDefault();
-    setIsProfileOpen(!isProfileOpen);
+  // ✅ Check if user is logged in
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    setIsAuthenticated(!!token);
+  }, []);
+
+  // ✅ Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("ethAddress");
+    setIsAuthenticated(false);
+    navigate("/");
   };
+
   return (
     <AppBar
       component="nav"
@@ -107,47 +97,44 @@ const Navbar = () => {
         <Box sx={{ display: { xs: "block", sm: "none" } }}>
           <DrawerItem />
         </Box>
+
+        {/* ✅ Home & About always visible */}
         <ListMenu>
-          {itemList.map((item) => {
-            const { text } = item;
-            return (
-              <ListItem key={text}>
+          <ListItem>
+            <ListItemButton component={Link} to="/" sx={{ color: "#fff" }}>
+              <ListItemText primary="Home" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem>
+            <ListItemButton component={Link} to="/about" sx={{ color: "#fff" }}>
+              <ListItemText primary="About" />
+            </ListItemButton>
+          </ListItem>
+
+          {/* ✅ Show different items based on authentication */}
+          {isAuthenticated ? (
+            <>
+              <ListItem>
                 <ListItemButton
                   component={Link}
-                  to={item.to}
-                  sx={{
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: "transparent",
-                      color: "#343a55",
-                      position: "relative",
-                    },
-                    "&:hover::after": {
-                      content: '""',
-                      position: "absolute",
-                      bottom: 5,
-                      left: 0,
-                      right: 0,
-                      height: 2,
-                      backgroundColor: "#343a55",
-                    },
-                  }}
+                  to="/feed"
+                  sx={{ color: "#fff" }}
                 >
-                  <ListItemText primary={text} />
+                  <ListItemText primary="Feed" />
                 </ListItemButton>
               </ListItem>
-            );
-          })}
-          <StyledLoginButton component={Link} to="/Login" variant="outlined">
-            Login
-          </StyledLoginButton>{" "}
-          <StyledLoginButton
-            component={Link} 
-            to="/profile"
-            variant="outlined"
-            >
-            Profile
-          </StyledLoginButton>
+              <StyledButton component={Link} to="/profile" variant="outlined">
+                Profile
+              </StyledButton>
+              <StyledButton onClick={handleLogout} variant="outlined">
+                Logout
+              </StyledButton>
+            </>
+          ) : (
+            <StyledButton component={Link} to="/login" variant="outlined">
+              Login
+            </StyledButton>
+          )}
         </ListMenu>
       </StyledToolbar>
     </AppBar>

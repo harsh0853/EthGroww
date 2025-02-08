@@ -8,10 +8,6 @@ import {
   Alert,
 } from "@mui/material";
 import { keyframes } from "@mui/system";
-import CreditScoreIcon from "@mui/icons-material/CreditScore";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import TimelineIcon from "@mui/icons-material/Timeline";
-import { CircularProgress, Divider } from "@mui/material";
 
 const fadeIn = keyframes`
   from {
@@ -110,7 +106,7 @@ const EthAddress = styled(Typography)({
   fontSize: "0.9rem",
   fontFamily: "monospace",
   cursor: "pointer",
-  flex: "0 0 50%",
+  flex: "0 0 60%",
   textAlign: "right",
   "&:hover": {
     backgroundColor: "#dee2e6",
@@ -121,41 +117,6 @@ const EthAddress = styled(Typography)({
   transition: "all 0.3s ease",
 });
 
-const ScoreContainer = styled(Box)({
-  width: "100%",
-  padding: ".5rem",
-  backgroundColor: "#f8f9fa",
-  borderRadius: "10px",
-  marginBottom: ".1rem",
-  textAlign: "center",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-5px)",
-    boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-  },
-});
-
-const StatContainer = styled(Box)({
-  display: "flex",
-  justifyContent: "space-around",
-  width: "100%",
-  marginTop: ".5rem",
-  gap: "1rem",
-});
-
-const StatBox = styled(Box)({
-  flex: 1,
-  padding: "1rem",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  textAlign: "center",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  transition: "transform 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-3px)",
-  },
-});
-
 const ProfileDashBoard = () => {
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -164,14 +125,10 @@ const ProfileDashBoard = () => {
   });
 
   const userData = {
-    name: "Abhilash Mishra",
+    name: "Harsh Raj",
     ethAddress: "0xf618434380708302905395b62f886e409dd21d39",
-    location: "Odisha , India",
+    location: "Odisha, India",
     avatarUrl: "/path/to/avatar.jpg",
-    creditScore: 750,
-    totalLoans: 5,
-    activeLoans: 2,
-    successRate: 90,
   };
 
   const handleCopyAddress = async () => {
@@ -212,7 +169,7 @@ const ProfileDashBoard = () => {
       </InfoContainer>
 
       <InfoContainer>
-        <InfoLabel>Eth. Address</InfoLabel>
+        <InfoLabel>Ethereum Address</InfoLabel>
         <EthAddress onClick={handleCopyAddress}>
           {`${userData.ethAddress.slice(0, 6)}...${userData.ethAddress.slice(
             -4
@@ -224,66 +181,6 @@ const ProfileDashBoard = () => {
         <InfoLabel>Location</InfoLabel>
         <InfoValue>{userData.location}</InfoValue>
       </InfoContainer>
-
-      <Divider sx={{ width: "100%", my: 1 }} />
-
-      <ScoreContainer>
-        <CreditScoreIcon sx={{ fontSize: 40, color: "#008bff", mb: 1 }} />
-        <Typography variant="h5" gutterBottom>
-          Credit Score
-        </Typography>
-        <Box sx={{ position: "relative", display: "inline-flex" }}>
-          <CircularProgress
-            variant="determinate"
-            value={(userData.creditScore / 850) * 100}
-            size={50}
-            thickness={3}
-            sx={{ color: userData.creditScore > 700 ? "#28a745" : "#dc3545" }}
-          />
-          <Box
-            sx={{
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
-              position: "absolute",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Typography variant="h6" component="div" color="text.secondary">
-              {userData.creditScore}
-            </Typography>
-          </Box>
-        </Box>
-      </ScoreContainer>
-
-      <StatContainer>
-        <StatBox>
-          <AccountBalanceIcon sx={{ color: "#007bff", mb: 1 }} />
-          <Typography variant="h6">{userData.totalLoans}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Total Loans
-          </Typography>
-        </StatBox>
-
-        <StatBox>
-          <TimelineIcon sx={{ color: "#28a745", mb: 1 }} />
-          <Typography variant="h6">{userData.activeLoans}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Active Loans
-          </Typography>
-        </StatBox>
-
-        <StatBox>
-          <CreditScoreIcon sx={{ color: "#dc3545", mb: 1 }} />
-          <Typography variant="h6">{userData.successRate}%</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Success Rate
-          </Typography>
-        </StatBox>
-      </StatContainer>
 
       <Snackbar
         open={snackbar.open}

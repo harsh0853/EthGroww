@@ -23,12 +23,12 @@ const shake = keyframes`
   100% { transform: translateX(0); }
 `;
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  marginLeft: theme.spacing(2),
+const StyledLoginButton = styled(Button)(({ theme }) => ({
+  marginLeft: theme.spacing(3),
   color: "#fff",
   border: "1px solid #fff",
   borderRadius: "15px",
-  padding: "10px 15px",
+  padding: "12px",
   transition: "all 0.3s ease-in-out",
   "&:hover": {
     animation: `${shake} 0.3s ease-in-out`,
@@ -50,31 +50,32 @@ const ListMenu = styled(List)(({ theme }) => ({
   },
 }));
 
+const itemList = [
+  { text: "Home", to: "/" },
+  { text: "About", to: "/about" },
+];
+
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Check if user is logged in
   useEffect(() => {
     const token = localStorage.getItem("userToken");
-    setIsAuthenticated(!!token);
+    setIsLoggedIn(!!token); // Set to true if token exists
   }, []);
 
-  // ✅ Logout function
   const handleLogout = () => {
     localStorage.removeItem("userToken");
     localStorage.removeItem("ethAddress");
-    setIsAuthenticated(false);
-    navigate("/");
+    setIsLoggedIn(false);
+    navigate("/"); // Redirect to home after logout
   };
 
   return (
     <AppBar
       component="nav"
       position="sticky"
-      sx={{
-        backgroundColor: "orange",
-      }}
+      sx={{ backgroundColor: "orange" }}
       elevation={0}
     >
       <StyledToolbar>
@@ -98,21 +99,36 @@ const Navbar = () => {
           <DrawerItem />
         </Box>
 
-        {/* ✅ Home & About always visible */}
         <ListMenu>
-          <ListItem>
-            <ListItemButton component={Link} to="/" sx={{ color: "#fff" }}>
-              <ListItemText primary="Home" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem>
-            <ListItemButton component={Link} to="/about" sx={{ color: "#fff" }}>
-              <ListItemText primary="About" />
-            </ListItemButton>
-          </ListItem>
+          {itemList.map((item) => (
+            <ListItem key={item.text}>
+              <ListItemButton
+                component={Link}
+                to={item.to}
+                sx={{
+                  color: "#fff",
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                    color: "#343a55",
+                    position: "relative",
+                  },
+                  "&:hover::after": {
+                    content: '""',
+                    position: "absolute",
+                    bottom: 5,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                    backgroundColor: "#343a55",
+                  },
+                }}
+              >
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
 
-          {/* ✅ Show different items based on authentication */}
-          {isAuthenticated ? (
+          {isLoggedIn && (
             <>
               <ListItem>
                 <ListItemButton
@@ -123,17 +139,24 @@ const Navbar = () => {
                   <ListItemText primary="Feed" />
                 </ListItemButton>
               </ListItem>
-              <StyledButton component={Link} to="/profile" variant="outlined">
-                Profile
-              </StyledButton>
-              <StyledButton onClick={handleLogout} variant="outlined">
-                Logout
-              </StyledButton>
+              <ListItem>
+                <ListItemButton
+                  component={Link}
+                  to="/profile"
+                  sx={{ color: "#fff" }}
+                >
+                  <ListItemText primary="Profile" />
+                </ListItemButton>
+              </ListItem>
             </>
+          )}
+
+          {isLoggedIn ? (
+            <StyledLoginButton onClick={handleLogout}>Logout</StyledLoginButton>
           ) : (
-            <StyledButton component={Link} to="/login" variant="outlined">
+            <StyledLoginButton component={Link} to="/login">
               Login
-            </StyledButton>
+            </StyledLoginButton>
           )}
         </ListMenu>
       </StyledToolbar>

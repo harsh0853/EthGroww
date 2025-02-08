@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
-import axios from "axios";
-
-const API_URL = "http://localhost:5000/api/v1/users"; // Backend API URL
 
 const styles = {
   modalOverlay: {
@@ -28,6 +25,7 @@ const styles = {
     width: "100%",
     maxWidth: "500px",
     margin: "5px",
+    animation: "modalFadeIn 0.3s ease-out",
     maxHeight: "80vh",
     overflowY: "auto",
   },
@@ -40,6 +38,63 @@ const styles = {
     fontSize: "24px",
     cursor: "pointer",
     color: "red",
+    transition: "color 0.3s ease",
+  },
+  "@keyframes modalFadeIn": {
+    from: {
+      opacity: 0,
+      transform: "translateY(-20px)",
+    },
+    to: {
+      opacity: 1,
+      transform: "translateY(0)",
+    },
+  },
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "58vh",
+    backgroundColor: "#f5f5f5",
+    padding: "10px",
+  },
+  formsContainer: {
+    display: "flex",
+    gap: "1rem",
+    width: "100%",
+    maxWidth: "700px",
+    margin: "0 auto",
+  },
+  formBox: {
+    flex: 1,
+    backgroundColor: "white",
+    padding: "0.5rem",
+    borderRadius: "8px",
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+  },
+
+  heading: {
+    textAlign: "center",
+    color: "#333",
+    marginBottom: "1.5rem",
+    fontFamily: "Yatra One",
+  },
+  formGroup: {
+    marginBottom: "0.5rem",
+  },
+  label: {
+    display: "block",
+    marginBottom: "0.5rem",
+    color: "#555",
+    fontWeight: "600",
+    fontFamily: "Almendra",
+  },
+  input: {
+    width: "95%",
+    padding: "0.75rem",
+    border: "1px solid #ddd",
+    borderRadius: "4px",
+    fontSize: "1rem",
   },
   button: {
     width: "100%",
@@ -50,7 +105,27 @@ const styles = {
     borderRadius: "4px",
     fontSize: "1rem",
     cursor: "pointer",
-    marginTop: "10px",
+    transition: "background-color 0.3s ease",
+  },
+  errorMessage: {
+    backgroundColor: "#fff3f3",
+    color: "#dc3545",
+    padding: "0.75rem",
+    borderRadius: "4px",
+    marginBottom: "1rem",
+    textAlign: "center",
+    border: "1px solid #ffcdd2",
+  },
+  toggleText: {
+    textAlign: "center",
+    marginTop: "1rem",
+    color: "#666",
+  },
+  toggleLink: {
+    color: "#007bff",
+    cursor: "pointer",
+    textDecoration: "underline",
+    marginLeft: "0.5rem",
   },
 };
 
@@ -63,115 +138,90 @@ const Login = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState({ login: "", signup: "" });
+  const navigate = useNavigate();
   const [isLoginView, setIsLoginView] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [walletAddress, setWalletAddress] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     checkLoginStatus();
+    // Add event listener for page refresh
+    const handleBeforeUnload = () => {
+      localStorage.removeItem("userToken");
+      setIsLoggedIn(false);
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
   }, []);
 
-  // ✅ Connect MetaMask Wallet
-  const connectWallet = async () => {
-    if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        setWalletAddress(accounts[0]);
-      } catch (error) {
-        console.error("Wallet connection failed:", error);
-      }
-    } else {
-      alert("MetaMask is not installed. Please install it.");
-    }
-  };
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
 
-  // ✅ Check if User is Already Logged In
-  const checkLoginStatus = () => {
-    const token = localStorage.getItem("userToken");
-    if (token) {
-      navigate("/");
-    }
-  };
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
-  // ✅ Handle Login Form Input Change
   const handleLoginChange = (e) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setLoginData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Handle Signup Form Input Change
   const handleSignupChange = (e) => {
-    setSignupData({ ...signupData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setSignupData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Login API Request
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-
     try {
-      const res = await axios.post(`${API_URL}/login`, {
-        email: loginData.email,
-        password: loginData.password,
-      });
-      console.log(res);
-      localStorage.setItem("userToken", res.data.data.accessToken);
-      localStorage.setItem("ethAddress", res.data.data.user.ethAddress);
-      setIsLoading(false);
-      setTimeout(() => {
-        navigate("/"); // Navigate after UI updates
-      }, 500);
+      setIsLoading(true);
+      console.log("Login attempt with:", loginData);
+      localStorage.setItem("userToken", "your-auth-token");
       setIsLoggedIn(true);
-      console.log("Successfull");
+      navigate("/");
     } catch (err) {
-      setError({
-        ...error,
-        login: err.response?.data?.message || "Login failed",
-      });
+      setError((prev) => ({ ...prev, login: "Invalid email or password" }));
+    } finally {
       setIsLoading(false);
     }
   };
 
-  // ✅ Signup API Request
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
 
-    if (!walletAddress) {
-      setError({
-        ...error,
-        signup: "Please connect MetaMask before signing up",
-      });
+    if (!validateAadhar(signupData.Aadhar)) {
+      setError((prev) => ({
+        ...prev,
+        signup: "Please enter a valid 12-digit Aadhar number",
+      }));
       return;
     }
-
-    if (signupData.password !== signupData.confirmPassword) {
-      setError({ ...error, signup: "Passwords do not match" });
-      return;
-    }
-
-    setIsLoading(true);
-
     try {
-      const res = await axios.post(`${API_URL}/register`, {
-        name: signupData.name,
-        email: signupData.email,
-        password: signupData.password,
-        ethAddress: walletAddress,
-      });
-
-      // localStorage.setItem("userToken", res.data.token);
-      setIsLoading(false);
+      console.log("Signup attempt with:", signupData);
       navigate("/");
     } catch (err) {
-      setError({
-        ...error,
-        signup: err.response?.data?.message || "Signup failed",
-      });
+      setError((prev) => ({ ...prev, signup: "Signup failed" }));
+    }
+  };
+
+  const checkLoginStatus = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem("userToken");
+      setIsLoggedIn(!!token);
+    } catch (error) {
+      console.error("Error checking login status:", error);
+    } finally {
       setIsLoading(false);
     }
+  };
+
+  const validateAadhar = (aadhar) => {
+    const aadharRegex = /^\d{12}$/;
+    return aadharRegex.test(aadhar);
   };
 
   return (
@@ -180,21 +230,25 @@ const Login = () => {
         <button style={styles.closeButton} onClick={() => navigate("/")}>
           ×
         </button>
-        <div>
+        <div style={styles.formsContainer}>
           {isLoginView ? (
-            // 🔵 LOGIN FORM
-            <div>
-              <h2>Login</h2>
-              {error.login && <div style={{ color: "red" }}>{error.login}</div>}
+            <div style={styles.formBox}>
+              <h2 style={styles.heading}>Login</h2>
+              {error.login && (
+                <div style={styles.errorMessage}>{error.login}</div>
+              )}
               <form onSubmit={handleLoginSubmit}>
                 <TextField
                   margin="normal"
                   required
                   fullWidth
+                  id="email"
                   label="Email Address"
                   name="email"
+                  autoComplete="email"
                   value={loginData.email}
                   onChange={handleLoginChange}
+                  autoFocus
                 />
                 <TextField
                   margin="normal"
@@ -203,50 +257,66 @@ const Login = () => {
                   name="password"
                   label="Password"
                   type="password"
+                  id="password"
+                  autoComplete="current-password"
                   value={loginData.password}
                   onChange={handleLoginChange}
                 />
                 <button
                   type="submit"
-                  style={styles.button}
-                  disabled={isLoading}
+                  style={{
+                    ...styles.button,
+                    backgroundColor: isLoggedIn || isLoading ? "#cccccc" : "#007bff",
+                    cursor: isLoggedIn || isLoading ? "not-allowed" : "pointer",
+                  }}
+                  disabled={isLoggedIn || isLoading}
+                  onMouseOver={(e) =>
+                    !isLoggedIn &&
+                    !isLoading &&
+                    (e.target.style.backgroundColor = "#0056b3")
+                  }
+                  onMouseOut={(e) =>
+                    !isLoggedIn &&
+                    !isLoading &&
+                    (e.target.style.backgroundColor = "#007bff")
+                  }
                 >
-                  {isLoading ? "Loading..." : "Login"}
+                  {isLoading ? "Loading..." : isLoggedIn ? "Already Logged In" : "Login"}
                 </button>
               </form>
-              <div>
-                Don't have an account?{" "}
-                <span
-                  style={{ color: "blue", cursor: "pointer" }}
-                  onClick={() => setIsLoginView(false)}
-                >
+              <div style={styles.toggleText}>
+                Don't have an account?
+                <span style={styles.toggleLink} onClick={() => setIsLoginView(false)}>
                   Sign up
                 </span>
               </div>
             </div>
           ) : (
-            // 🟢 SIGNUP FORM
-            <div>
-              <h2>Sign Up</h2>
+            <div style={styles.formBox}>
+              <h2 style={styles.heading}>Sign Up</h2>
               {error.signup && (
-                <div style={{ color: "red" }}>{error.signup}</div>
+                <div style={styles.errorMessage}>{error.signup}</div>
               )}
               <form onSubmit={handleSignupSubmit}>
                 <TextField
                   margin="normal"
                   required
                   fullWidth
+                  id="username"
                   label="Username"
                   name="name"
                   value={signupData.name}
                   onChange={handleSignupChange}
+                  autoFocus
                 />
                 <TextField
                   margin="normal"
                   required
                   fullWidth
+                  id="email"
                   label="Email Address"
                   name="email"
+                  autoComplete="email"
                   value={signupData.email}
                   onChange={handleSignupChange}
                 />
@@ -257,6 +327,7 @@ const Login = () => {
                   name="password"
                   label="Password"
                   type="password"
+                  id="password"
                   value={signupData.password}
                   onChange={handleSignupChange}
                 />
@@ -267,34 +338,52 @@ const Login = () => {
                   name="confirmPassword"
                   label="Confirm Password"
                   type="password"
+                  id="confirmPassword"
                   value={signupData.confirmPassword}
                   onChange={handleSignupChange}
                 />
-                {walletAddress ? (
-                  <p>Connected Wallet: {walletAddress}</p>
-                ) : (
-                  <button
-                    type="button"
-                    style={styles.button}
-                    onClick={connectWallet}
-                  >
-                    Connect with MetaMask
-                  </button>
-                )}
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="Aadhar"
+                  label="Aadhar Number"
+                  id="aadhar"
+                  value={signupData.Aadhar}
+                  onChange={handleSignupChange}
+                  inputProps={{
+                    maxLength: 12,
+                    pattern: "\\d{12}"
+                  }}
+                  error={signupData.Aadhar && !validateAadhar(signupData.Aadhar)}
+                  helperText={
+                    signupData.Aadhar && !validateAadhar(signupData.Aadhar)
+                      ? "Please enter a valid 12-digit Aadhar number"
+                      : ""
+                  }
+                />
                 <button
                   type="submit"
                   style={styles.button}
-                  disabled={isLoading}
+                  onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
+                  onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
                 >
-                  {isLoading ? "Loading..." : "Sign Up"}
+                  Sign Up
                 </button>
               </form>
+              <div style={styles.toggleText}>
+                Already have an account?
+                <span style={styles.toggleLink} onClick={() => setIsLoginView(true)}>
+                  Login
+                </span>
+              </div>
             </div>
           )}
         </div>
       </div>
     </div>
-  );
-};
+    );
+  };
+  
+  export default Login;
 
-export default Login;
