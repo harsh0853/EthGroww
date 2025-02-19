@@ -1,0 +1,27 @@
+.news-container {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+}
+
+.news-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.news-item h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.news-item a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.news-item a:hover {
+  text-decoration: underline;
+} 

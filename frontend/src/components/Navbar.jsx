@@ -12,7 +12,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import DrawerItem from "./DrawerItem";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { keyframes } from "@mui/material/styles";
 
 const shake = keyframes`
@@ -58,18 +58,45 @@ const itemList = [
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem("userToken");
-    setIsLoggedIn(!!token); // Set to true if token exists
-  }, []);
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!token);
+    };
+
+    checkLoginStatus();
+
+    window.addEventListener("storage", checkLoginStatus);
+
+    return () => {
+      window.removeEventListener("storage", checkLoginStatus);
+    };
+  }, [location]);
 
   const handleLogout = () => {
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("ethAddress");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("walletAddress");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("refreshToken");
     setIsLoggedIn(false);
-    navigate("/"); // Redirect to home after logout
+    navigate("/");
   };
+
+  const customEvent = new Event("loginStateChanged");
+
+  const handleLoginStateChange = () => {
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+  };
+
+  useEffect(() => {
+    window.addEventListener("loginStateChanged", handleLoginStateChange);
+    return () => {
+      window.removeEventListener("loginStateChanged", handleLoginStateChange);
+    };
+  }, []);
 
   return (
     <AppBar

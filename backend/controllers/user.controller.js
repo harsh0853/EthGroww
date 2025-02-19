@@ -23,25 +23,51 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
+  // Log the incoming request body for debugging
+  console.log("Request body:", req.body);
+
   const { email, username, password, ethAddress } = req.body;
 
-  if ([email, username, password].some((field) => field?.trim() === "")) {
-    throw new ApiError(400, "All fields are required");
-  }
-  //check  if user already exists or not
-  const existedUser = await User.findOne({
-    $or: [{ username }, { email }, { ethAddress }],
-  });
-  console.log(username);
-  if (existedUser) {
-    throw new ApiError(409, "User with email or username already exists");
+  // More detailed validation
+  const missingFields = [];
+  if (!email) missingFields.push("email");
+  if (!username) missingFields.push("username");
+  if (!password) missingFields.push("password");
+
+  if (missingFields.length > 0) {
+    throw new ApiError(
+      400,
+      `Missing required fields: ${missingFields.join(", ")}`
+    );
   }
 
+  // Validate that fields are not empty strings after trimming
+  if ([email, username, password].some((field) => field.trim() === "")) {
+    throw new ApiError(400, "All fields are required and cannot be empty");
+  }
+
+  // Check if user already exists
+  const existedUser = await User.findOne({
+    $or: [
+      { username: username.toLowerCase() },
+      { email: email.toLowerCase() },
+      ...(ethAddress ? [{ ethAddress }] : []), // Only include ethAddress in query if it exists
+    ],
+  });
+
+  if (existedUser) {
+    throw new ApiError(
+      409,
+      "User with email, username, or wallet address already exists"
+    );
+  }
+
+  // Create new user
   const user = await User.create({
-    email,
+    email: email.toLowerCase(),
     password,
     username: username.toLowerCase(),
-    ethAddress,
+    ...(ethAddress && { ethAddress }), // Only include ethAddress if it exists
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -54,22 +80,17 @@ const registerUser = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(200, createdUser, "user registered successfully"));
+    .json(new ApiResponse(200, createdUser, "User registered successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  // req body
-  // username or email
-  // find the user
-  // password check
-  // access & refresh token
-  // send cookies
   const { email, password } = req.body;
-  if (!password || !email) {
-    throw new ApiError(400, "username or email is required");
+
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: email.toLowerCase() });
 
   if (!user) {
     throw new ApiError(404, "User does not exist");
@@ -78,7 +99,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordValid = await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    throw new ApiError(401, "Inalid user credentials");
+    throw new ApiError(401, "Invalid credentials");
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
@@ -89,6 +110,19 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
+  // Log the response data for debugging
+  const responseData = {
+    status: 200,
+    data: {
+      user: loggedInUser,
+      accessToken,
+      refreshToken,
+    },
+    message: "User logged in successfully",
+  };
+
+  console.log("Server Response:", responseData); // Debug log
+
   const options = {
     httpOnly: true,
     secure: true,
@@ -98,17 +132,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          user: loggedInUser,
-          accessToken,
-          refreshToken,
-        },
-        "user logged in successfully"
-      )
-    );
+    .json(new ApiResponse(200, responseData.data, responseData.message));
 });
 
 const logOutUser = asyncHandler(async (req, res) => {

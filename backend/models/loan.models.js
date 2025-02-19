@@ -1,74 +1,41 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 import { User } from "./user.models.js";
 
-const loanSchema = new Schema(
+const loanSchema = new mongoose.Schema(
   {
     uniqueId: {
       type: String,
+      required: true,
       unique: true,
     },
-
-    borrower: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    loanId: {
+      type: String,
       required: true,
     },
-
     borrowerEthAddress: {
       type: String,
       required: true,
     },
-
-    lender: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
-    },
-
-    lenderEthAddress: {
-      type: String,
-      default: null,
-    },
-
     loanAmount: {
       type: Number,
       required: true,
-      min: 0,
     },
-
-    interestRate: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-
     time: {
       type: Number,
       required: true,
-      min: 1,
     },
-
-    totalRepayable: {
-      type: Number,
-      default: 0,
-    },
-
-    emiAmount: {
-      type: Number,
-      default: 0,
-    },
-
     isFunded: {
       type: Boolean,
       default: false,
     },
-
     isRepaid: {
       type: Boolean,
       default: false,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 // Pre-save Hook: Fetch Borrower & Lender Eth Address & Compute Interest

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
+import { ethers } from "ethers";
 
 const styles = {
   modalOverlay: {
@@ -129,6 +130,8 @@ const styles = {
   },
 };
 
+const API_BASE_URL = "http://localhost:5000/api/v1"; // Remove /users from base URL
+
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({
@@ -136,12 +139,15 @@ const Login = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    Aadhar: "",
   });
   const [error, setError] = useState({ login: "", signup: "" });
   const navigate = useNavigate();
   const [isLoginView, setIsLoginView] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
 
   useEffect(() => {
     checkLoginStatus();
@@ -158,7 +164,6 @@ const Login = () => {
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
-
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -167,23 +172,94 @@ const Login = () => {
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    setError((prev) => ({ ...prev, login: "" }));
   };
 
   const handleSignupChange = (e) => {
     const { name, value } = e.target;
     setSignupData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    setError((prev) => ({ ...prev, signup: "" }));
   };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setError((prev) => ({ ...prev, login: "" }));
+
     try {
       setIsLoading(true);
-      console.log("Login attempt with:", loginData);
-      localStorage.setItem("userToken", "your-auth-token");
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: loginData.email.toLowerCase(),
+          password: loginData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Store tokens and user data
+      localStorage.setItem("accessToken", data.data.accessToken);
+      localStorage.setItem("refreshToken", data.data.refreshToken);
+      localStorage.setItem("userData", JSON.stringify(data.data.user));
+
+      if (data.data.user?.ethAddress) {
+        localStorage.setItem("walletAddress", data.data.user.ethAddress);
+      }
+
+      // Dispatch custom event to notify Navbar
+      window.dispatchEvent(new Event("loginStateChanged"));
+
       setIsLoggedIn(true);
       navigate("/");
     } catch (err) {
-      setError((prev) => ({ ...prev, login: "Invalid email or password" }));
+      setError((prev) => ({
+        ...prev,
+        login: err.message || "Invalid email or password",
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const connectWallet = async () => {
+    try {
+      if (!window.ethereum) {
+        throw new Error("Please install MetaMask to continue");
+      }
+
+      setIsLoading(true);
+      // Request account access
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      const address = accounts[0];
+      setWalletAddress(address);
+      setIsWalletConnected(true);
+
+      // Add wallet address to signup data
+      setSignupData((prev) => ({
+        ...prev,
+        walletAddress: address,
+      }));
+
+      return address;
+    } catch (error) {
+      setError((prev) => ({
+        ...prev,
+        signup: error.message || "Failed to connect wallet",
+      }));
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -191,6 +267,16 @@ const Login = () => {
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
+    setError((prev) => ({ ...prev, signup: "" }));
+
+    // Validation
+    if (signupData.password !== signupData.confirmPassword) {
+      setError((prev) => ({
+        ...prev,
+        signup: "Passwords do not match",
+      }));
+      return;
+    }
 
     if (!validateAadhar(signupData.Aadhar)) {
       setError((prev) => ({
@@ -199,21 +285,83 @@ const Login = () => {
       }));
       return;
     }
+
+    // Connect wallet if not already connected
+    if (!isWalletConnected) {
+      const address = await connectWallet();
+      if (!address) return; // Stop if wallet connection failed
+    }
+
     try {
-      console.log("Signup attempt with:", signupData);
+      setIsLoading(true);
+      const response = await fetch(`${API_BASE_URL}/users/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          username: signupData.name,
+          email: signupData.email,
+          password: signupData.password,
+          aadhar: signupData.Aadhar,
+          ethAddress: walletAddress,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Signup failed");
+      }
+
+      // Store the token, user data, and wallet address
+      localStorage.setItem("userToken", data.token);
+      localStorage.setItem(
+        "userData",
+        JSON.stringify({
+          ...data.user,
+          walletAddress: walletAddress,
+        })
+      );
+      localStorage.setItem("walletAddress", walletAddress);
+      setIsLoggedIn(true);
       navigate("/");
     } catch (err) {
-      setError((prev) => ({ ...prev, signup: "Signup failed" }));
+      setError((prev) => ({
+        ...prev,
+        signup: err.message || "Signup failed. Please try again.",
+      }));
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const checkLoginStatus = async () => {
     try {
-      setIsLoading(true);
       const token = localStorage.getItem("userToken");
-      setIsLoggedIn(!!token);
+      if (!token) {
+        setIsLoggedIn(false);
+        return;
+      }
+
+      // Verify token with backend
+      const response = await fetch(`${API_BASE_URL}/current-user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid token");
+      }
+
+      setIsLoggedIn(true);
     } catch (error) {
       console.error("Error checking login status:", error);
+      localStorage.removeItem("userToken");
+      localStorage.removeItem("userData");
+      setIsLoggedIn(false);
     } finally {
       setIsLoading(false);
     }
@@ -223,6 +371,43 @@ const Login = () => {
     const aadharRegex = /^\d{12}$/;
     return aadharRegex.test(aadhar);
   };
+
+  // Modify the signup form JSX to include wallet connection button
+  // Add this button before the signup submit button
+  const WalletConnectButton = () => (
+    <button
+      type="button"
+      style={{
+        ...styles.button,
+        marginBottom: "1rem",
+        backgroundColor: isWalletConnected ? "#28a745" : "#007bff",
+      }}
+      onClick={connectWallet}
+      disabled={isWalletConnected}
+    >
+      {isWalletConnected
+        ? `Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+        : "Connect MetaMask"}
+    </button>
+  );
+
+  // Add this function to check stored data
+  const checkStoredData = () => {
+    const userData = localStorage.getItem("userData");
+    const accessToken = localStorage.getItem("accessToken");
+    const walletAddress = localStorage.getItem("walletAddress");
+
+    console.log("Stored User Data:", userData);
+    console.log("Access Token:", accessToken);
+    console.log("Wallet Address:", walletAddress);
+  };
+
+  // Add this to your useEffect to verify data is being stored
+  useEffect(() => {
+    if (isLoggedIn) {
+      checkStoredData();
+    }
+  }, [isLoggedIn]);
 
   return (
     <div style={styles.modalOverlay}>
@@ -266,7 +451,8 @@ const Login = () => {
                   type="submit"
                   style={{
                     ...styles.button,
-                    backgroundColor: isLoggedIn || isLoading ? "#cccccc" : "#007bff",
+                    backgroundColor:
+                      isLoggedIn || isLoading ? "#cccccc" : "#007bff",
                     cursor: isLoggedIn || isLoading ? "not-allowed" : "pointer",
                   }}
                   disabled={isLoggedIn || isLoading}
@@ -281,12 +467,19 @@ const Login = () => {
                     (e.target.style.backgroundColor = "#007bff")
                   }
                 >
-                  {isLoading ? "Loading..." : isLoggedIn ? "Already Logged In" : "Login"}
+                  {isLoading
+                    ? "Loading..."
+                    : isLoggedIn
+                    ? "Already Logged In"
+                    : "Login"}
                 </button>
               </form>
               <div style={styles.toggleText}>
                 Don't have an account?
-                <span style={styles.toggleLink} onClick={() => setIsLoginView(false)}>
+                <span
+                  style={styles.toggleLink}
+                  onClick={() => setIsLoginView(false)}
+                >
                   Sign up
                 </span>
               </div>
@@ -353,27 +546,37 @@ const Login = () => {
                   onChange={handleSignupChange}
                   inputProps={{
                     maxLength: 12,
-                    pattern: "\\d{12}"
+                    pattern: "\\d{12}",
                   }}
-                  error={signupData.Aadhar && !validateAadhar(signupData.Aadhar)}
+                  error={
+                    signupData.Aadhar && !validateAadhar(signupData.Aadhar)
+                  }
                   helperText={
                     signupData.Aadhar && !validateAadhar(signupData.Aadhar)
                       ? "Please enter a valid 12-digit Aadhar number"
                       : ""
                   }
                 />
+                <WalletConnectButton />
                 <button
                   type="submit"
                   style={styles.button}
-                  onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
-                  onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
+                  onMouseOver={(e) =>
+                    (e.target.style.backgroundColor = "#0056b3")
+                  }
+                  onMouseOut={(e) =>
+                    (e.target.style.backgroundColor = "#007bff")
+                  }
                 >
                   Sign Up
                 </button>
               </form>
               <div style={styles.toggleText}>
                 Already have an account?
-                <span style={styles.toggleLink} onClick={() => setIsLoginView(true)}>
+                <span
+                  style={styles.toggleLink}
+                  onClick={() => setIsLoginView(true)}
+                >
                   Login
                 </span>
               </div>
@@ -382,8 +585,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-    );
-  };
-  
-  export default Login;
+  );
+};
 
+export default Login;

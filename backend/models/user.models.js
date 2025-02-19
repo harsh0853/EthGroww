@@ -41,6 +41,18 @@ const userSchema = new Schema(
       required: false,
       default: 700,
     },
+    totalLoans: {
+      type: Number,
+      default: 0,
+    },
+    activeLoans: {
+      type: Number,
+      default: 0,
+    },
+    successRate: {
+      type: Number,
+      default: 100,
+    },
     // aadhaarDetails: {
     //     aadhaarNumber: {
     //         type: String,
