@@ -14,6 +14,7 @@ import {
 import DrawerItem from "./DrawerItem";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { keyframes } from "@mui/material/styles";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 
 const shake = keyframes`
   0% { transform: translateX(0); }
@@ -157,6 +158,15 @@ const Navbar = () => {
 
           {isLoggedIn && (
             <>
+              <ListItem>
+                <ListItemButton
+                  component={Link}
+                  to="/active-loans"
+                  sx={{ color: "#fff" }}
+                >
+                  <ListItemText primary="Active Loans" />
+                </ListItemButton>
+              </ListItem>
               <ListItem>
                 <ListItemButton
                   component={Link}

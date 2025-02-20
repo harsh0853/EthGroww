@@ -5,111 +5,121 @@ contract MicroloanPlatform {
     struct Loan {
         address borrower;
         address lender;
-        uint128 amount;         // Reduced from uint256 to uint128 (saves gas)
-        uint128 repaidAmount;   // Reduced size to uint128
-        uint64 duration;        // Reduced size to uint64 (seconds-based)
-        uint16 interestRate;    // Interest rate in basis points (e.g., 500 for 5.00%)
-        uint32 startTime;       // Timestamp when funded
+        uint128 amount;
+        uint16 interestRate;
+        uint64 duration;
+        uint64 startTime;
+        uint128 repaidAmount;
         bool isFunded;
         bool isRepaid;
         bool isDefaulted;
     }
 
-    mapping(uint256 => Loan) public loans;
-    mapping(address => uint256) public creditScores;
-    uint256 public loanCounter;
+    mapping(uint => Loan) public loans;
+    mapping(address => uint) public creditScores;
+    uint public loanCounter;
 
-    event LoanRequested(uint256 indexed loanId, address indexed borrower, uint128 amount, uint16 interestRate, uint64 duration);
-    event LoanFunded(uint256 indexed loanId, address indexed lender);
-    event LoanRepaid(uint256 indexed loanId, uint128 amount);
-    event LoanDefaulted(uint256 indexed loanId);
+    event LoanRequested(
+        uint loanId,
+        address indexed borrower,
+        uint128 amount,
+        uint16 interestRate,
+        uint64 duration
+    );
+    event LoanFunded(uint loanId, address indexed lender, uint128 amount);
+    event LoanRepaid(uint loanId, uint128 amount);
+    event LoanDefaulted(uint loanId);
+    event Debug(uint loanId);
 
     constructor() {
-        creditScores[msg.sender] = 700;
+        creditScores[msg.sender] = 700; // Default credit score for contract owner
     }
 
-    /// @notice Borrower requests a loan (No Collateral Required).
-    /// @param _amount Loan amount in wei
-    /// @param _interestRate Interest rate in basis points (500 = 5.00%)
-    /// @param _duration Loan duration in seconds
     function requestLoan(uint128 _amount, uint16 _interestRate, uint64 _duration) external {
-        require(creditScores[msg.sender] >= 600, "Low credit score");
+    require(_amount > 0, "Loan amount must be greater than zero");
 
-        unchecked { loanCounter++; }
+    unchecked { loanCounter++; }
 
-        loans[loanCounter] = Loan({
-            borrower: msg.sender,
-            lender: address(0),
-            amount: _amount,
-            interestRate: _interestRate,
-            duration: _duration,
-            startTime: 0,
-            repaidAmount: 0,
-            isFunded: false,
-            isRepaid: false,
-            isDefaulted: false
-        });
+    loans[loanCounter] = Loan({
+        borrower: msg.sender,
+        lender: address(0),
+        amount: _amount,
+        interestRate: _interestRate,
+        duration: _duration,
+        startTime: 0,
+        repaidAmount: 0,
+        isFunded: false,
+        isRepaid: false,
+        isDefaulted: false
+    });
 
-        emit LoanRequested(loanCounter, msg.sender, _amount, _interestRate, _duration);
-    }
+    emit LoanRequested(loanCounter, msg.sender, _amount, _interestRate, _duration);
+    emit Debug(loanCounter); // 🛠 Debug event
+}
 
-    /// @notice Lender funds a borrower's loan request.
-    /// @param _loanId The ID of the loan to fund
+
     function fundLoan(uint256 _loanId) external payable {
         Loan storage loan = loans[_loanId];
-        require(!loan.isFunded, "Already funded");
-        require(msg.value == loan.amount, "Incorrect amount");
 
-        loan.lender = msg.sender;
+        emit Debug(_loanId);
+
+        require(!loan.isFunded, "Loan is already funded");
+        require(msg.sender != loan.borrower, "You cannot fund your own loan");
+        require(msg.value == loan.amount, "Incorrect funding amount");
+
         loan.isFunded = true;
-        loan.startTime = uint32(block.timestamp);
+        loan.lender = msg.sender;
+        loan.startTime = uint64(block.timestamp); // Start loan duration timer
 
-        (bool success, ) = loan.borrower.call{value: loan.amount}("");
-        require(success, "Transfer failed");
+        // Transfer funds to borrower
+        (bool success, ) = payable(loan.borrower).call{value: msg.value}("");
+        require(success, "Transfer to borrower failed");
 
-        emit LoanFunded(_loanId, msg.sender);
+        emit LoanFunded(_loanId, msg.sender, loan.amount);
     }
 
-    /// @notice Borrower repays the loan.
-    /// @param _loanId The ID of the loan to repay
-    function repayLoan(uint256 _loanId) external payable {
-        Loan storage loan = loans[_loanId];
+    function repayLoan(uint loanId) external payable {
+        Loan storage loan = loans[loanId];
+
         require(msg.sender == loan.borrower, "Only borrower can repay");
-        require(loan.isFunded, "Loan not funded");
-        require(!loan.isRepaid, "Already repaid");
+        require(loan.isFunded, "Loan is not funded");
+        require(!loan.isRepaid, "Loan is already repaid");
 
-        uint128 totalPayable = loan.amount + (loan.amount * loan.interestRate / 10000); // 10000 for basis points
-        require(msg.value <= totalPayable - loan.repaidAmount, "Excess repayment");
+        loan.repaidAmount += uint128(msg.value);
 
-        unchecked { loan.repaidAmount += uint128(msg.value); }
-
-        (bool success, ) = loan.lender.call{value: msg.value}("");
-        require(success, "Transfer failed");
-
-        emit LoanRepaid(_loanId, uint128(msg.value));
-
-        if (loan.repaidAmount >= totalPayable) {
+        if (loan.repaidAmount >= loan.amount) {
             loan.isRepaid = true;
-            unchecked { creditScores[loan.borrower] += 10; }
+            
+            // Send funds to lender
+            (bool success, ) = payable(loan.lender).call{value: loan.repaidAmount}("");
+            require(success, "Transfer to lender failed");
+
+            emit LoanRepaid(loanId, loan.repaidAmount);
         }
     }
 
-    /// @notice If borrower fails to repay on time, apply a penalty.
-    /// @param _loanId The ID of the loan to penalize
-    function applyPenalty(uint256 _loanId) external {
-        Loan storage loan = loans[_loanId];
-        require(loan.isFunded, "Not funded");
-        require(block.timestamp > loan.startTime + loan.duration, "Not overdue");
-        require(!loan.isRepaid, "Already repaid");
+    function markDefault(uint loanId) external {
+        Loan storage loan = loans[loanId];
+
+        require(loan.isFunded, "Loan is not funded");
+        require(!loan.isRepaid, "Loan is already repaid");
+        require(block.timestamp > loan.startTime + loan.duration, "Loan not overdue");
 
         loan.isDefaulted = true;
-        unchecked { creditScores[loan.borrower] -= 50; }
+        creditScores[loan.borrower] -= 50; // Reduce credit score on default
 
-        emit LoanDefaulted(_loanId);
+        emit LoanDefaulted(loanId);
     }
 
-    /// @notice Fetch borrower's credit score.
-    function getCreditScore(address _user) external view returns (uint256) {
-        return creditScores[_user];
+    function getCreditScore(address _borrower) external view returns (uint) {
+        return creditScores[_borrower];
+    }
+
+    function getLoan(uint loanId) external view returns (Loan memory) {
+        return loans[loanId];
+    }
+
+    function getLoanCounter() external view returns (uint) {
+        return loanCounter;
     }
 }
