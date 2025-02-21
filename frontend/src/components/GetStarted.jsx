@@ -6,10 +6,30 @@ import Title from "./Title";
 import imgDetail from "../assets/eth5.jpeg";
 import imgDetail2 from "../assets/eth4.jpeg";
 
+
+const NewsItem = styled("div")({
+  gap: "5px",
+  padding: "15px",
+  // borderRadius: "8px",
+  backgroundColor: "white",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  "& h3": {
+    marginTop: 2,
+    color: "#333",
+  },
+  "& a": {
+    color: "#007bff",
+    textDecoration: "none",
+    "&:hover": {
+      textDecoration: "underline",
+    },
+  },
+});
+
 const NewsContainer = styled(Box)({
   width: "95%",
   padding: "2rem",
-  marginTop: "2rem",
+  marginTop: "6rem",
 });
 const NewsAlert = styled(Alert)({
   marginBottom: "2rem",
@@ -185,43 +205,40 @@ const GetStarted = () => {
           ) : news.length > 0 ? (
             <div className="news-container">
               {news.map((item, index) => (
-                <NewsAlert
-                  key={index}
-                  severity="info"
-                  sx={{
-                    "& .MuiAlert-message": {
-                      width: "90%",
-                    },
-                  }}
-                >
-                  <AlertTitle>{item.title}</AlertTitle>
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    {item.description?.slice(0, 200)}...
-                  </Typography>
-                  <Box
+                <NewsItem key={index}>
+                  <NewsAlert
+                    severity="info"
                     sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      mt: 1,
+                      "& .MuiAlert-message": {
+                        width: "90%",
+                      },
                     }}
                   >
-                    <Typography variant="caption" color="text.secondary">
-                      {new Date(item.pubDate).toLocaleDateString()}
+                    <AlertTitle>{item.title}</AlertTitle>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      {item.description?.slice(0, 200)}...
                     </Typography>
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: "#007bff",
-                        textDecoration: "none",
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mt: 1,
                       }}
                     >
-                      Read more
-                    </a>
-                  </Box>
-                </NewsAlert>
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(item.pubDate).toLocaleDateString()}
+                      </Typography>
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Read more
+                      </a>
+                    </Box>
+                  </NewsAlert>
+                </NewsItem>
               ))}
             </div>
           ) : (
