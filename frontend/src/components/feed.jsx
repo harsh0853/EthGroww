@@ -360,7 +360,7 @@ const Feed = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
+          height: "47vh",
         }}
       >
         <CircularProgress />
@@ -369,8 +369,7 @@ const Feed = () => {
   }
 
   return (
-    <Box sx={{ padding: 3, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
-      {/* Header Section */}
+    <Box sx={{ padding: 3, backgroundColor: "#f5f5f5", minHeight: "41vh" }}>
       <Box
         sx={{
           display: "flex",
