@@ -53,6 +53,10 @@ const userSchema = new Schema(
       type: Number,
       default: 100,
     },
+    isSubscribed: {
+      type: Boolean,
+      default: false, // Users are NOT subscribed by default
+    },
     // aadhaarDetails: {
     //     aadhaarNumber: {
     //         type: String,
