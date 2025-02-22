@@ -7,7 +7,6 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import Newsletter from "./Newsletter";
 
 const Footer = () => {
-
   const StyledLink = styled(Link)({
     fontSize: "1rem", // Increased from default
     color: "#414141",
@@ -20,13 +19,8 @@ const Footer = () => {
   });
 
   const FooterLink = ({ text }) => {
-    return (
-      <StyledLink variant="body2">
-        {text}
-      </StyledLink>
-    );
+    return <StyledLink variant="body2">{text}</StyledLink>;
   };
-  
 
   const StackColumn = styled(Stack)(() => ({
     flexDirection: "column",
@@ -36,7 +30,7 @@ const Footer = () => {
     gap: 12,
     textAlign: "center",
   }));
-  
+
   const BoxRow = styled(Box)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
@@ -55,13 +49,12 @@ const Footer = () => {
         py: 4,
         px: 2,
         fontSize: "30px",
-
       }}
     >
       <StackColumn>
         <FooterTitle text={"Contact Us"} />
-        <FooterLink text={"Top G Town , IIT Khandagiri"} />
-        <FooterLink text={"(123) 456-7890"} />
+        <FooterLink text={"ITER Bhubaneswar"} />
+        <FooterLink text={"+91 9337939133"} />
         <FooterLink text={"info@microloans.com"} />
       </StackColumn>
 
@@ -89,7 +82,6 @@ const Footer = () => {
               "&:hover": {
                 color: "orange",
                 fontSize: "1rem", // Increased from default
-
               },
             }}
           >
@@ -103,7 +95,6 @@ const Footer = () => {
               "&:hover": {
                 color: "orange",
                 fontSize: "1rem", // Increased from default
-
               },
             }}
           >

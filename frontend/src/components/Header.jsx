@@ -13,7 +13,7 @@ const tiltAnimation = `
   }
 `;
 
-const RotatingImage = styled('img')`
+const RotatingImage = styled("img")`
   width: 80%;
   animation: tilt 5s ease-in-out infinite alternate;
   transform-style: preserve-3d;
@@ -83,6 +83,8 @@ const Header = () => {
 
         <Box>
           <Button
+            component={Link}
+            to={"/login"}
             variant="contained"
             sx={{
               mr: 2,
@@ -102,7 +104,7 @@ const Header = () => {
               },
             }}
           >
-            buy now
+            Sign Up
           </Button>
           <Button
             component={Link}
@@ -146,10 +148,7 @@ const Header = () => {
           },
         })}
       >
-        <RotatingImage
-          src={headerImg}
-          alt="headerImg"
-        />
+        <RotatingImage src={headerImg} alt="headerImg" />
       </Box>
     </CustomBox>
   );

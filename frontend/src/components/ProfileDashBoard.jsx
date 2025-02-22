@@ -18,17 +18,19 @@ import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { CircularProgress, Divider } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
+// const fadeIn = keyframes`
+//   from {
+//     opacity: 0;
+//     transform: translateX(20px);
+//   }
+//   to {
+//     opacity: 1;
+//     transform: translateX(0);
+//   }
+// `;
 
 const glowEffect = keyframes`
   0% { box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
@@ -36,11 +38,27 @@ const glowEffect = keyframes`
   100% { box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
 `;
 
-const SidebarContainer = styled(Box)(({ theme }) => ({
+const UploadButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  bottom: 8,
+  right: 0,
+  backgroundColor: '#007bff',
+  color: 'white',
+  padding: '8px',
+  '&:hover': {
+    backgroundColor: '#0056b3',
+  },
+  '& .MuiSvgIcon-root': {
+    fontSize: '20px',
+  },
+}));
+
+
+const SidebarContainer = styled(Box)(({ theme, isOpen }) => ({
   position: "fixed",
   right: 0,
-  top: 55,
-  width: "280px",
+  top: 0,
+  width: "380px",
   height: "100vh",
   backgroundColor: "#ffffff",
   boxShadow: "-5px 0 15px rgba(0, 0, 0, 0.1)",
@@ -48,19 +66,46 @@ const SidebarContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  zIndex: 1000,
-  animation: `${fadeIn} 0.5s ease-out`,
-  "&:hover": {
-    boxShadow: "-8px 0 20px rgba(0, 0, 0, 0.15)",
+  zIndex: 1300,
+  transform: isOpen ? "translateX(0)" : "translateX(100%)",
+  transition: "transform 0.3s ease-in-out",
+  overflowY: "auto",
+  "&::-webkit-scrollbar": {
+    width: "8px",
   },
-  transition: "box-shadow 0.3s ease",
+  "&::-webkit-scrollbar-track": {
+    background: "#f1f1f1",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    background: "#888",
+    borderRadius: "4px",
+  },
 }));
+
+const ModalOverlay = styled(Box)(({ isOpen }) => ({
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  zIndex: 1200,
+  opacity: isOpen ? 1 : 0,
+  visibility: isOpen ? "visible" : "hidden",
+  transition: "opacity 0.3s ease, visibility 0.3s ease",
+}));
+
+const AvatarContainer = styled(Box)({
+  position: 'relative',
+  marginTop: '2rem',
+  marginBottom: '1rem',
+});
 
 const ProfileAvatar = styled(Avatar)(({ theme }) => ({
   top: 0,
   width: "100px",
   height: "100px",
-  marginBottom: "1.5rem",
+  marginBottom: "1rem",
   border: "4px solid #007bff",
   cursor: "pointer",
   transition: "all 0.3s ease",
@@ -73,7 +118,7 @@ const ProfileAvatar = styled(Avatar)(({ theme }) => ({
 const InfoContainer = styled(Box)({
   width: "100%",
   marginBottom: "1rem",
-  padding: "1rem",
+  padding: ".2rem",
   backgroundColor: "#f8f9fa",
   borderRadius: "10px",
   display: "flex",
@@ -88,7 +133,7 @@ const InfoContainer = styled(Box)({
 
 const InfoLabel = styled(Typography)({
   color: "#666",
-  fontSize: "0.9rem",
+  fontSize: "1rem",
   fontWeight: 500,
   textTransform: "uppercase",
   letterSpacing: "1px",
@@ -110,7 +155,8 @@ const InfoValue = styled(Typography)({
 });
 
 const EthAddress = styled(Typography)({
-  backgroundColor: "#e9ecef",
+  backgroundColor: "#dee1e8",
+  color: "#333",
   padding: "0.5rem",
   borderRadius: "5px",
   fontSize: "0.9rem",
@@ -132,7 +178,7 @@ const ScoreContainer = styled(Box)({
   padding: ".5rem",
   backgroundColor: "#f8f9fa",
   borderRadius: "10px",
-  marginBottom: ".1rem",
+  color: "#888",
   textAlign: "center",
   transition: "transform 0.3s ease, box-shadow 0.3s ease",
   "&:hover": {
@@ -146,7 +192,7 @@ const StatContainer = styled(Box)({
   justifyContent: "space-around",
   width: "100%",
   marginTop: ".5rem",
-  gap: "1rem",
+  gap: ".8rem",
 });
 
 const StatBox = styled(Box)({
@@ -162,9 +208,24 @@ const StatBox = styled(Box)({
   },
 });
 
+const CloseButton = styled(Button)({
+  position: "absolute",
+  top: "1rem",
+  right: "1rem",
+  minWidth: "40px",
+  width: "40px",
+  height: "40px",
+  borderRadius: "50%",
+  backgroundColor: "rgba(0, 0, 0, 0.1)",
+  color: "#666",
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+  },
+});
+
 const API_URL = "http://localhost:5000/api/v1";
 
-const ProfileDashBoard = () => {
+const ProfileDashBoard = ({ isOpen, onClose }) => {
   const [userData, setUserData] = useState(null);
   const [activeLoans, setActiveLoans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -177,6 +238,52 @@ const ProfileDashBoard = () => {
     severity: "success",
   });
   const [location, setLocation] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+
+  const handleAvatarChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setAvatarFile(file);
+      const imageUrl = URL.createObjectURL(file);
+      setAvatarUrl(imageUrl);
+      
+      // Optional: Upload to server
+      handleAvatarUpload(file);
+    }
+  };
+
+  const handleAvatarUpload = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await fetch(`${API_URL}/user/upload-avatar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload avatar');
+      }
+
+      setSnackbar({
+        open: true,
+        message: 'Profile picture updated successfully!',
+        severity: 'success',
+      });
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to update profile picture',
+        severity: 'error',
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -386,193 +493,226 @@ const ProfileDashBoard = () => {
   }
 
   return (
-    <SidebarContainer>
-      <ProfileAvatar src={userData?.avatarUrl} alt={userData?.name}>
-        {userData?.name
-          ?.split(" ")
-          .map((n) => n[0])
-          .join("")}
-      </ProfileAvatar>
+    <>
+      <ModalOverlay isOpen={isOpen} onClick={onClose} />
+      <SidebarContainer isOpen={isOpen}>
+        <CloseButton onClick={onClose}>×</CloseButton>
 
-      <InfoContainer>
-        <InfoLabel>Name</InfoLabel>
-        <InfoValue>{userData?.name || "Anonymous User"}</InfoValue>
-      </InfoContainer>
-
-      <InfoContainer>
-        <InfoLabel>Eth. Address</InfoLabel>
-        <EthAddress onClick={handleCopyAddress}>
-          {userData?.ethAddress
-            ? `${userData.ethAddress.slice(0, 6)}...${userData.ethAddress.slice(
-                -4
-              )}`
-            : "Not Connected"}
-        </EthAddress>
-      </InfoContainer>
-
-      <InfoContainer>
-        <InfoLabel>Location</InfoLabel>
-        <InfoValue>{userData?.location || "Location not available"}</InfoValue>
-      </InfoContainer>
-
-      <Divider sx={{ width: "100%", my: 1 }} />
-
-      <ScoreContainer>
-        <CreditScoreIcon sx={{ fontSize: 40, color: "#007bff", mb: 1 }} />
-        <Typography variant="h5" gutterBottom>
-          Credit Score
-        </Typography>
-        <Box sx={{ position: "relative", display: "inline-flex" }}>
-          <CircularProgress
-            variant="determinate"
-            value={((userData?.creditScore || 0) / 850) * 100}
-            size={80}
-            thickness={4}
-            sx={{
-              color: (userData?.creditScore || 0) > 700 ? "#28a745" : "#dc3545",
-              backgroundColor: "#f5f5f5",
-              borderRadius: "50%",
-            }}
+        <AvatarContainer>
+          <ProfileAvatar
+            src={avatarUrl || userData?.avatarUrl}
+            alt={userData?.name}
+          >
+            {!avatarUrl && !userData?.avatarUrl && userData?.name
+              ?.split(" ")
+              .map((n) => n[0])
+              .join("")}
+          </ProfileAvatar>
+          <input
+            accept="image/*"
+            type="file"
+            id="avatar-upload"
+            onChange={handleAvatarChange}
+            style={{ display: 'none' }}
           />
-          <Box
-            sx={{
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
-              position: "absolute",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Typography
-              variant="h6"
-              component="div"
-              color="text.primary"
-              sx={{ fontWeight: "bold" }}
+          <label htmlFor="avatar-upload">
+            <UploadButton component="span">
+              <PhotoCameraIcon />
+            </UploadButton>
+          </label>
+        </AvatarContainer>
+
+        <InfoContainer>
+          <InfoLabel>Name</InfoLabel>
+          <InfoValue>{userData?.name || "Anonymous User"}</InfoValue>
+        </InfoContainer>
+
+        <InfoContainer>
+          <InfoLabel>Eth. Address</InfoLabel>
+          <EthAddress onClick={handleCopyAddress}>
+            {userData?.ethAddress
+              ? `${userData.ethAddress.slice(
+                  0,
+                  6
+                )}...${userData.ethAddress.slice(-4)}`
+              : "Not Connected"}
+          </EthAddress>
+        </InfoContainer>
+
+        <InfoContainer>
+          <InfoLabel>Location</InfoLabel>
+          <InfoValue>
+            {userData?.location || "Location not available"}
+          </InfoValue>
+        </InfoContainer>
+
+        <Divider sx={{ width: "100%", my: 1 }} />
+
+        <ScoreContainer>
+          <CreditScoreIcon sx={{ fontSize: 40, color: "#007bff", mb: 1 }} />
+          <Typography variant="h5" gutterBottom>
+            Credit Score
+          </Typography>
+          <Box sx={{ position: "relative", display: "inline-flex" }}>
+            <CircularProgress
+              variant="determinate"
+              value={((userData?.creditScore || 0) / 850) * 100}
+              size={80}
+              thickness={4}
+              sx={{
+                color:
+                  (userData?.creditScore || 0) > 700 ? "#28a745" : "#dc3545",
+                backgroundColor: "#f5f5f5",
+                borderRadius: "50%",
+              }}
+            />
+            <Box
+              sx={{
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                position: "absolute",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {userData?.creditScore || 0}
-            </Typography>
+              <Typography
+                variant="h6"
+                component="div"
+                color="text.primary"
+                sx={{ fontWeight: "bold" }}
+              >
+                {userData?.creditScore || 0}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {(userData?.creditScore || 0) > 700 ? "Excellent" : "Fair"}
-        </Typography>
-      </ScoreContainer>
-
-      <Divider sx={{ width: "100%", my: 2 }} />
-
-      {/* Loan Statistics */}
-      <StatContainer>
-        <StatBox>
-          <AccountBalanceIcon sx={{ color: "#007bff", mb: 1 }} />
-          <Typography variant="h6">{userData?.totalLoans || 0}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Total Loans
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {(userData?.creditScore || 0) > 700 ? "Excellent" : "Fair"}
           </Typography>
-        </StatBox>
+        </ScoreContainer>
 
-        <StatBox>
-          <TimelineIcon sx={{ color: "#28a745", mb: 1 }} />
-          <Typography variant="h6">{userData?.activeLoans || 0}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Active Loans
-          </Typography>
-        </StatBox>
+        <Divider sx={{ width: "100%", my: 2 }} />
 
-        <StatBox>
-          <CreditScoreIcon sx={{ color: "#dc3545", mb: 1 }} />
-          <Typography variant="h6">
-            {userData?.successRate?.toFixed(1) || 100}%
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Success Rate
-          </Typography>
-        </StatBox>
-      </StatContainer>
+        {/* Loan Statistics */}
+        <StatContainer>
+          <StatBox>
+            <AccountBalanceIcon sx={{ color: "#007bff", mb: 1 }} />
+            <Typography variant="h6">{userData?.totalLoans || 0}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Total Loans
+            </Typography>
+          </StatBox>
 
-      {/* Active Loans Section */}
-      <Typography variant="h6" sx={{ mt: 3, mb: 2, width: "100%" }}>
-        Active Loans ({userData?.activeLoans || 0})
-      </Typography>
+          <StatBox>
+            <TimelineIcon sx={{ color: "#28a745", mb: 1 }} />
+            <Typography variant="h6">{userData?.activeLoans || 0}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Active Loans
+            </Typography>
+          </StatBox>
 
-      {activeLoans.length > 0 ? (
-        activeLoans.map((loan) => (
-          <Box
-            key={loan.loanId}
-            sx={{
-              width: "100%",
-              p: 2,
-              mb: 2,
-              backgroundColor: "#f8f9fa",
-              borderRadius: "10px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            }}
-          >
-            <Typography variant="subtitle1">
-              Loan Amount: {loan.loanAmount} ETH
+          <StatBox>
+            <CreditScoreIcon sx={{ color: "#dc3545", mb: 1 }} />
+            <Typography variant="h6">
+              {userData?.successRate?.toFixed(1) || 100}%
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Duration: {loan.time} months
+              Success Rate
             </Typography>
+          </StatBox>
+        </StatContainer>
+
+        {/* Active Loans Section */}
+        <Typography variant="h6" sx={{ mt: 3, mb: 2, width: "100%" }}>
+          Active Loans ({userData?.activeLoans || 0})
+        </Typography>
+
+        {activeLoans.length > 0 ? (
+          activeLoans.map((loan) => (
+            <Box
+              key={loan.loanId}
+              sx={{
+                width: "100%",
+                p: 2,
+                mb: 2,
+                backgroundColor: "#f8f9fa",
+                borderRadius: "10px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              }}
+            >
+              <Typography variant="subtitle1">
+                Loan Amount: {loan.loanAmount} ETH
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Duration: {loan.time} months
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 1 }}
+                onClick={() => handleRepayClick(loan)}
+              >
+                Repay Loan
+              </Button>
+            </Box>
+          ))
+        ) : (
+          <Typography variant="body1" color="text.secondary">
+            No active loans found
+          </Typography>
+        )}
+
+        {/* Repay Dialog */}
+        <Dialog
+          open={openRepayDialog}
+          onClose={() => setOpenRepayDialog(false)}
+        >
+          <DialogTitle>Repay Loan</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Repayment Amount (ETH)"
+              type="number"
+              fullWidth
+              value={repayAmount}
+              onChange={(e) => setRepayAmount(e.target.value)}
+              InputProps={{
+                inputProps: { step: "0.000000000000000001" },
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenRepayDialog(false)}>Cancel</Button>
             <Button
+              onClick={handleRepayLoan}
               variant="contained"
               color="primary"
-              fullWidth
-              sx={{ mt: 1 }}
-              onClick={() => handleRepayClick(loan)}
             >
-              Repay Loan
+              Confirm Repayment
             </Button>
-          </Box>
-        ))
-      ) : (
-        <Typography variant="body1" color="text.secondary">
-          No active loans found
-        </Typography>
-      )}
+          </DialogActions>
+        </Dialog>
 
-      {/* Repay Dialog */}
-      <Dialog open={openRepayDialog} onClose={() => setOpenRepayDialog(false)}>
-        <DialogTitle>Repay Loan</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Repayment Amount (ETH)"
-            type="number"
-            fullWidth
-            value={repayAmount}
-            onChange={(e) => setRepayAmount(e.target.value)}
-            InputProps={{
-              inputProps: { step: "0.000000000000000001" },
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenRepayDialog(false)}>Cancel</Button>
-          <Button onClick={handleRepayLoan} variant="contained" color="primary">
-            Confirm Repayment
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={3000}
           onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </SidebarContainer>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </SidebarContainer>
+    </>
   );
 };
 

@@ -372,8 +372,6 @@ const Login = () => {
     return aadharRegex.test(aadhar);
   };
 
-  // Modify the signup form JSX to include wallet connection button
-  // Add this button before the signup submit button
   const WalletConnectButton = () => (
     <button
       type="button"
