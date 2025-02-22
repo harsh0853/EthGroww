@@ -307,7 +307,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 //   try {
 //     await transporter.sendMail({
 //       from: `"EthGrow" <${process.env.EMAIL_USER}>`,
-//       to: updatedUser.email, 
+//       to: updatedUser.email,
 //       subject: updatedUser.isSubscribed
 //         ? "Welcome to Our Newsletter!"
 //         : "You have unsubscribed!",
@@ -321,15 +321,14 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 //   } catch (error) {
 //       throw new ApiError(500, "Something went wrong!")
 //   }
-  
+
 //   return res.status(200).json(
 //       new ApiResponse(
-//           200, 
+//           200,
 //           {isSubscribed: updatedUser.isSubscribed},
 //           "Subscription updated successfully")
 //   )
 // });
-
 
 const updateSubscription = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -338,7 +337,7 @@ const updateSubscription = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(404, "User doesn't exist");
   }
- 
+
   const newSubscriptionStatus = !user.isSubscribed;
 
   try {
@@ -355,23 +354,52 @@ const updateSubscription = asyncHandler(async (req, res) => {
         ? "<h2>Welcome!</h2><p>We are excited to have you with us!</p>"
         : "<h2>Goodbye!</h2><p>We're sorry to see you go. You can subscribe again anytime!</p>",
     });
-
   } catch (error) {
     user.isSubscribed = !user.isSubscribed;
     await user.save();
-    
+
     throw new ApiError(500, "Subscription update failed. Please try again.");
   }
-    user.isSubscribed = newSubscriptionStatus;
-    await user.save();
+  user.isSubscribed = newSubscriptionStatus;
+  await user.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { isSubscribed: user.isSubscribed },
+        "Subscription updated successfully"
+      )
+    );
+});
+
+const updateAvatar = asyncHandler(async (req, res) => {
+	const userId = req.user?._id;
+	if(!userId) throw new ApiError(400, "Id not found");
+
+  const user = await User.findById(userId);
+  if(!user) throw new ApiError(400, "User not found");
+	
+	const avatarLocalpath = req.file?.path;
+
+  console.log(avatarLocalpath);
+  
+	if(!avatarLocalpath){
+		throw new ApiError(400, "Avatar file is required");
+	}
+
+	const avatar = await uploadOnCloudinary(avatarLocalpath);
+
+	if(!avatar) throw new ApiError(500, "failed to upload");
+
+  user.avatar = avatar?.url;
+  await user.save();
 
   return res.status(200).json(
-    new ApiResponse(
-      200,
-      { isSubscribed: user.isSubscribed },
-      "Subscription updated successfully"
-    )
-  );
+    new ApiResponse(200, avatar , "Avatar successfully saved")
+  )
+
 });
 
 export {
@@ -381,5 +409,6 @@ export {
   refreshAccessToken,
   getCurrentUser,
   updateAccountDetails,
-  updateSubscription
+  updateSubscription,
+  updateAvatar
 };
