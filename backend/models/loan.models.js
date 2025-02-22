@@ -23,6 +23,10 @@ const loanSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    collateral: {
+      type: Number,
+      required: true,
+    },
     loanPayableAmount: {
       type: Number,
       required: true,

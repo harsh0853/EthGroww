@@ -36,7 +36,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
     boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
   },
 }));
-const contractAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 const AddLoanButton = styled(Button)(({ theme }) => ({
   borderRadius: "50px",
   padding: "12px 24px",
@@ -63,6 +63,7 @@ const Feed = () => {
 
   const [newLoan, setNewLoan] = useState({
     amount: "",
+    collateral: "",
     duration: "",
     purpose: "",
   });
@@ -167,19 +168,29 @@ const Feed = () => {
       const loanPayableAmount = principal + interest;
 
       const amountInWei = ethers.parseEther(newLoan.amount.toString());
+      const collateralInWei = ethers.parseEther(newLoan.collateral.toString());
 
       console.log("Sending loan request to blockchain and database", {
         amountInWei: amountInWei.toString(),
         durationInSeconds,
         interestRate,
       });
-
+      if (
+        parseFloat(newLoan.collateral) <
+          (parseFloat(newLoan.amount) + parseFloat(1)) / 2 &&
+        parseFloat(newLoan.collateral) >= 0.75 * parseFloat(newLoan.amount)
+      ) {
+        throw new Error(
+          "Collateral must be between 50% and 75% of the loan amount"
+        );
+      }
       // Send transaction to blockchain
       const tx = await contract.requestLoan(
-        amountInWei,
+        collateralInWei,
         interestRate,
-        durationInSeconds
-      );
+        durationInSeconds,
+        { value: amountInWei }
+      ); // fir heera pheeri
 
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
@@ -192,7 +203,7 @@ const Feed = () => {
 
       const loanId = log.args.loanId.toString();
       console.log("Loan created on blockchain with Loan ID:", loanId);
-
+      //console.log(newLoan.collateral);
       // Send loan request to the database
       const response = await fetch(
         "http://localhost:5000/api/v1/feed/create-loan",
@@ -206,6 +217,7 @@ const Feed = () => {
             amount: newLoan.amount.toString(),
             loanPayableAmount: loanPayableAmount.toString(),
             duration: Number(newLoan.duration),
+            collateral: newLoan.collateral.toString(),
             loanId: loanId,
             ethAddress: userData.ethAddress,
           }),
@@ -553,7 +565,29 @@ const Feed = () => {
                 },
               }}
             />
-
+            <TextField
+              name="collateral"
+              label="Loan Collateral (ETH)"
+              type="number"
+              value={newLoan.collateral}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Allow only valid numbers with up to 18 decimal places
+                if (value === "" || /^\d*\.?\d{0,18}$/.test(value)) {
+                  setNewLoan((prev) => ({
+                    ...prev,
+                    collateral: value,
+                  }));
+                }
+              }}
+              fullWidth
+              InputProps={{
+                inputProps: {
+                  step: "0.1",
+                  min: "0",
+                },
+              }}
+            />
             <TextField
               name="duration"
               label="Loan Duration"
