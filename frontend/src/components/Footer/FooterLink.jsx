@@ -14,7 +14,7 @@ const FooterLink = ({ text }) => {
       color: '#414141',
       textTransform: 'capitalize',
       "&:hover": {
-        color: 'orange',
+        color: 'red',
       }
     }}
     >

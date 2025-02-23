@@ -26,6 +26,7 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import TimerIcon from "@mui/icons-material/Timer";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import AddIcon from "@mui/icons-material/Add";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { ethers } from "ethers";
 import contractABI from "./contractABI.json";
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -36,7 +37,9 @@ const StyledCard = styled(Card)(({ theme }) => ({
     boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
   },
 }));
-const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+
 const AddLoanButton = styled(Button)(({ theme }) => ({
   borderRadius: "50px",
   padding: "12px 24px",
@@ -63,6 +66,7 @@ const Feed = () => {
 
   const [newLoan, setNewLoan] = useState({
     amount: "",
+    collateral: "",
     duration: "",
     purpose: "",
   });
@@ -167,19 +171,29 @@ const Feed = () => {
       const loanPayableAmount = principal + interest;
 
       const amountInWei = ethers.parseEther(newLoan.amount.toString());
+      const collateralInWei = ethers.parseEther(newLoan.collateral.toString());
 
       console.log("Sending loan request to blockchain and database", {
         amountInWei: amountInWei.toString(),
         durationInSeconds,
         interestRate,
       });
-
+      if (
+        parseFloat(newLoan.collateral) <
+          (parseFloat(newLoan.amount) + parseFloat(1)) / 2 &&
+        parseFloat(newLoan.collateral) >= 0.75 * parseFloat(newLoan.amount)
+      ) {
+        throw new Error(
+          "Collateral must be between 50% and 75% of the loan amount"
+        );
+      }
       // Send transaction to blockchain
       const tx = await contract.requestLoan(
-        amountInWei,
+        collateralInWei,
         interestRate,
-        durationInSeconds
-      );
+        durationInSeconds,
+        { value: amountInWei }
+      ); // fir heera pheeri
 
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
@@ -192,7 +206,7 @@ const Feed = () => {
 
       const loanId = log.args.loanId.toString();
       console.log("Loan created on blockchain with Loan ID:", loanId);
-
+      //console.log(newLoan.collateral);
       // Send loan request to the database
       const response = await fetch(
         "http://localhost:5000/api/v1/feed/create-loan",
@@ -206,6 +220,7 @@ const Feed = () => {
             amount: newLoan.amount.toString(),
             loanPayableAmount: loanPayableAmount.toString(),
             duration: Number(newLoan.duration),
+            collateral: newLoan.collateral.toString(),
             loanId: loanId,
             ethAddress: userData.ethAddress,
           }),
@@ -369,20 +384,29 @@ const Feed = () => {
   }
 
   return (
-    <Box sx={{ padding: 3, backgroundColor: "#f5f5f5", minHeight: "41vh" }}>
+    <Box
+      sx={{
+        padding: 3,
+        backgroundColor: "transparent",
+        backdropFilter: "blur(10px)", 
+        minHeight: "calc(100vh - 80px)", // Full viewport height minus navbar height
+        position: "relative",
+        zIndex: 1, // Ensure it's under the navbar if needed
+      }}
+    >
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 4,
+          marginTop: 11,
         }}
       >
         <Typography
           variant="h4"
           sx={{
             fontFamily: "Yatra One",
-            color: "#333",
+            color: "aliceblue",
           }}
         >
           Loan Requests
@@ -392,10 +416,13 @@ const Feed = () => {
           startIcon={<AddIcon />}
           onClick={handleAddLoan}
           sx={{
-            backgroundColor: "#28a745",
+            backgroundColor: "transparent",
+            border: "1px solid cyan",
             "&:hover": {
-              backgroundColor: "#218838",
+              backgroundColor: "cyan",
+              color:"black"
             },
+            color:"white"
           }}
         >
           Add Loan Request
@@ -522,10 +549,12 @@ const Feed = () => {
             padding: 2,
             maxWidth: "500px",
             width: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.1)", // Transparent background
+            backdropFilter: "blur(10px)", // Blurred background
           },
         }}
       >
-        <DialogTitle sx={{ fontFamily: "Yatra One", color: "#333" }}>
+        <DialogTitle sx={{ fontFamily: "Yatra One", color: "#fff" }}>
           Create New Loan Request
         </DialogTitle>
         <DialogContent>
@@ -552,8 +581,52 @@ const Feed = () => {
                   min: "0",
                 },
               }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#00ffff", // Cyan border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on focus
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  color: "#fff", // White input text color
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#00ffff", // Cyan label color
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#00ffff", // Cyan label color on focus
+                },
+              }}
             />
-
+            <TextField
+              name="collateral"
+              label="Loan Collateral (ETH)"
+              type="number"
+              value={newLoan.collateral}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Allow only valid numbers with up to 18 decimal places
+                if (value === "" || /^\d*\.?\d{0,18}$/.test(value)) {
+                  setNewLoan((prev) => ({
+                    ...prev,
+                    collateral: value,
+                  }));
+                }
+              }}
+              fullWidth
+              InputProps={{
+                inputProps: {
+                  step: "0.1",
+                  min: "0",
+                },
+              }}
+            />
             <TextField
               name="duration"
               label="Loan Duration"
@@ -561,8 +634,43 @@ const Feed = () => {
               value={newLoan.duration}
               onChange={handleInputChange}
               fullWidth
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      backgroundColor: "#333", // Gray background color
+                      color: "#00ffff", // Cyan text color
+                    },
+                  },
+                },
+                IconComponent: (props) => (
+                  <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#00ffff", // Cyan border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on focus
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  color: "#fff", // White input text color
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#00ffff", // Cyan label color
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#00ffff", // Cyan label color on focus
+                },
+              }}
             >
-              <MenuItem value={1}>1 months</MenuItem>
+              <MenuItem value={1}>1 month</MenuItem>
               <MenuItem value={2}>2 months</MenuItem>
               <MenuItem value={3}>3 months</MenuItem>
               <MenuItem value={4}>4 months</MenuItem>
@@ -583,6 +691,41 @@ const Feed = () => {
               value={newLoan.purpose}
               onChange={handleInputChange}
               fullWidth
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      backgroundColor: "#333", // Gray background color
+                      color: "#00ffff", // Cyan text color
+                    },
+                  },
+                },
+                IconComponent: (props) => (
+                  <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#00ffff", // Cyan border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on focus
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  color: "#fff", // White input text color
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#00ffff", // Cyan label color
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#00ffff", // Cyan label color on focus
+                },
+              }}
             >
               <MenuItem value="Business Expansion">Business Expansion</MenuItem>
               <MenuItem value="Equipment Purchase">Equipment Purchase</MenuItem>
@@ -596,7 +739,7 @@ const Feed = () => {
           <Button
             onClick={handleAddClose}
             sx={{
-              color: "text.secondary",
+              color: "#00ffff", // Cyan color
               "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
             }}
           >
@@ -606,8 +749,9 @@ const Feed = () => {
             variant="contained"
             onClick={handleCreateRequest}
             sx={{
-              backgroundColor: "#28a745",
-              "&:hover": { backgroundColor: "#218838" },
+              backgroundColor: "#333", // Dark gray background
+              color: "#00ffff", // Cyan color
+              "&:hover": { backgroundColor: "#555" }, // Slightly lighter dark gray on hover
             }}
           >
             Create Request

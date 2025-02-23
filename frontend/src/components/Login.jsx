@@ -19,7 +19,7 @@ const styles = {
   },
   modalContent: {
     position: "relative",
-    backgroundColor: "white",
+    backgroundColor: "#333", // Dark gray background color
     borderRadius: "8px",
     padding: "1.5rem",
     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
@@ -68,15 +68,14 @@ const styles = {
   },
   formBox: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#333", // Dark gray background color
     padding: "0.5rem",
     borderRadius: "8px",
     boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
   },
-
   heading: {
     textAlign: "center",
-    color: "#333",
+    color: "#fff", // White heading color
     marginBottom: "1.5rem",
     fontFamily: "Yatra One",
   },
@@ -86,22 +85,24 @@ const styles = {
   label: {
     display: "block",
     marginBottom: "0.5rem",
-    color: "#555",
+    color: "#00ffff", // Cyan label color
     fontWeight: "600",
     fontFamily: "Almendra",
   },
   input: {
     width: "95%",
     padding: "0.75rem",
-    border: "1px solid #ddd",
+    border: "1px solid #00ffff", // Cyan border color
     borderRadius: "4px",
     fontSize: "1rem",
+    color: "aliceblue", // Alice blue input text color
+    backgroundColor: "#333", // Dark gray background color
   },
   button: {
     width: "100%",
     padding: "0.75rem",
-    backgroundColor: "#007bff",
-    color: "white",
+    backgroundColor: "#333", // Dark gray background color
+    color: "#00ffff", // Cyan text color
     border: "none",
     borderRadius: "4px",
     fontSize: "1rem",
@@ -123,7 +124,7 @@ const styles = {
     color: "#666",
   },
   toggleLink: {
-    color: "#007bff",
+    color: "#00ffff", // Cyan link color
     cursor: "pointer",
     textDecoration: "underline",
     marginLeft: "0.5rem",
@@ -432,6 +433,28 @@ const Login = () => {
                   value={loginData.email}
                   onChange={handleLoginChange}
                   autoFocus
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#00ffff", // Cyan border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on hover
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on focus
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: "aliceblue", // Alice blue input text color
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#00ffff", // Cyan label color
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#00ffff", // Cyan label color on focus
+                    },
+                  }}
                 />
                 <TextField
                   margin="normal"
@@ -444,25 +467,47 @@ const Login = () => {
                   autoComplete="current-password"
                   value={loginData.password}
                   onChange={handleLoginChange}
-                />
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#00ffff", // Cyan border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on hover
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on focus
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: "aliceblue", // Alice blue input text color
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#00ffff", // Cyan label color
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#00ffff", // Cyan label color on focus
+                    },
+                  }}
+                />  
                 <button
                   type="submit"
                   style={{
                     ...styles.button,
                     backgroundColor:
-                      isLoggedIn || isLoading ? "#cccccc" : "#007bff",
+                      isLoggedIn || isLoading ? "#cccccc" : "#333", // Dark gray background color
                     cursor: isLoggedIn || isLoading ? "not-allowed" : "pointer",
                   }}
                   disabled={isLoggedIn || isLoading}
                   onMouseOver={(e) =>
                     !isLoggedIn &&
                     !isLoading &&
-                    (e.target.style.backgroundColor = "#0056b3")
+                    (e.target.style.backgroundColor = "#555") // Slightly lighter dark gray on hover
                   }
                   onMouseOut={(e) =>
                     !isLoggedIn &&
                     !isLoading &&
-                    (e.target.style.backgroundColor = "#007bff")
+                    (e.target.style.backgroundColor = "#333") // Dark gray background color
                   }
                 >
                   {isLoading
@@ -499,6 +544,28 @@ const Login = () => {
                   value={signupData.name}
                   onChange={handleSignupChange}
                   autoFocus
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#00ffff", // Cyan border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on hover
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on focus
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: "aliceblue", // Alice blue input text color
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#00ffff", // Cyan label color
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#00ffff", // Cyan label color on focus
+                    },
+                  }}
                 />
                 <TextField
                   margin="normal"
@@ -510,6 +577,28 @@ const Login = () => {
                   autoComplete="email"
                   value={signupData.email}
                   onChange={handleSignupChange}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#00ffff", // Cyan border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on hover
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on focus
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: "aliceblue", // Alice blue input text color
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#00ffff", // Cyan label color
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#00ffff", // Cyan label color on focus
+                    },
+                  }}
                 />
                 <TextField
                   margin="normal"
@@ -521,6 +610,28 @@ const Login = () => {
                   id="password"
                   value={signupData.password}
                   onChange={handleSignupChange}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#00ffff", // Cyan border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on hover
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on focus
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: "aliceblue", // Alice blue input text color
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#00ffff", // Cyan label color
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#00ffff", // Cyan label color on focus
+                    },
+                  }}
                 />
                 <TextField
                   margin="normal"
@@ -532,6 +643,28 @@ const Login = () => {
                   id="confirmPassword"
                   value={signupData.confirmPassword}
                   onChange={handleSignupChange}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#00ffff", // Cyan border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on hover
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on focus
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: "aliceblue", // Alice blue input text color
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#00ffff", // Cyan label color
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#00ffff", // Cyan label color on focus
+                    },
+                  }}
                 />
                 <TextField
                   margin="normal"
@@ -554,16 +687,38 @@ const Login = () => {
                       ? "Please enter a valid 12-digit Aadhar number"
                       : ""
                   }
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#00ffff", // Cyan border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on hover
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#00ffff", // Cyan border color on focus
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: "aliceblue", // Alice blue input text color
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#00ffff", // Cyan label color
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#00ffff", // Cyan label color on focus
+                    },
+                  }}
                 />
                 <WalletConnectButton />
                 <button
                   type="submit"
                   style={styles.button}
                   onMouseOver={(e) =>
-                    (e.target.style.backgroundColor = "#0056b3")
+                    (e.target.style.backgroundColor = "#555") // Slightly lighter dark gray on hover
                   }
                   onMouseOut={(e) =>
-                    (e.target.style.backgroundColor = "#007bff")
+                    (e.target.style.backgroundColor = "#333") // Dark gray background color
                   }
                 >
                   Sign Up
