@@ -162,7 +162,7 @@ const getAllLoans = asyncHandler(async (req, res) => {
 
     // Find all loans
     const loans = await Loan.find(
-      {},
+      {isRepaid: false},
       "loanId loanAmount time borrowerEthAddress isFunded"
     );
 
@@ -181,6 +181,7 @@ const getAllLoans = asyncHandler(async (req, res) => {
           borrowerEthAddress: loan.borrowerEthAddress,
           creditScore: borrower?.creditScore || "Unknown", // Default to "Unknown" if user not found
           isFunded: loan.isFunded,
+          
         };
       })
     );
@@ -232,6 +233,8 @@ const getActiveLoans = asyncHandler(async (req, res) => {
           borrowerEthAddress: loan.borrowerEthAddress,
           lenderEthAddress: loan.lenderEthAddress,
           creditScore: borrower?.creditScore || "Unknown",
+          updatedAt: loan.updatedAt,
+          createdAt: loan.createdAt
         };
       })
     );

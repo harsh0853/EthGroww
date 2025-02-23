@@ -225,6 +225,7 @@ const CloseButton = styled(Button)({
 
 const API_URL = "http://localhost:5000/api/v1";
 
+
 const ProfileDashBoard = ({ isOpen, onClose }) => {
   const [userData, setUserData] = useState(null);
   const [activeLoans, setActiveLoans] = useState([]);
@@ -238,6 +239,8 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
     severity: "success",
   });
   const [location, setLocation] = useState("");
+  const [email, setEmail] = useState("");
+
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
 
@@ -252,6 +255,7 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
       handleAvatarUpload(file);
     }
   };
+
 
   const handleAvatarUpload = async (file) => {
     try {
@@ -544,6 +548,11 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
           <InfoValue>
             {userData?.location || "Location not available"}
           </InfoValue>
+        </InfoContainer>
+
+        <InfoContainer>
+          <InfoLabel>Name</InfoLabel>
+          <InfoValue>{userData?.email || "Anonymous User"}</InfoValue>
         </InfoContainer>
 
         <Divider sx={{ width: "100%", my: 1 }} />

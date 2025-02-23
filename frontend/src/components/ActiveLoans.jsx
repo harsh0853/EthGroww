@@ -16,7 +16,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import contractABI from "./contractABI.json";
-const contractAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 const ActiveLoansContainer = styled(Box)({
   display: 'flex',
@@ -92,9 +92,12 @@ const ActiveLoans = () => {
           throw new Error("Failed to fetch active loans");
         }
 
+
         const data = await response.json();
         console.log("Active Loans:", data);
 
+        console.log(data.data.updatedAt);
+        
         if (data && data.data) {
           setActiveLoans(data.data);
         } else {
@@ -146,6 +149,7 @@ const ActiveLoans = () => {
       const result = await response.json();
       if (!response.ok) throw new Error(result.message);
 
+      
       alert("Loan repaid successfully!");
       setActiveLoans((prevLoans) =>
         prevLoans.filter((loan) => loan.loanId !== loanId)
@@ -321,6 +325,7 @@ const ActiveLoans = () => {
                     <strong>Created:</strong> {new Date(loan.createdAt).toLocaleDateString()}
                   </Typography>
                 </LoanInfoItem>
+                
               </Box>
               
               <Box sx={{ 
