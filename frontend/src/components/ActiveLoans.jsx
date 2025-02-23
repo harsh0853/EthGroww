@@ -24,8 +24,9 @@ const ActiveLoansContainer = styled(Box)({
   gap: '24px',
   padding: '24px',
   backgroundColor: '#f5f5f5',
-  minHeight: '40vh',
+  minHeight: 'calc(100vh - 80px)', // Full viewport height minus navbar height
 });
+
 
 const LoanCard = styled(Grid)({
   flex: '1 1 calc(33.333% - 24px)',
@@ -182,97 +183,19 @@ const ActiveLoans = () => {
     );
   }
 
-  // const DummyLoansCard = () => {
-  //   return (
-  //     <ActiveLoansContainer>
-  //       <Box sx={{ width: '100%' }}>
-  //       <Typography variant="h4" gutterBottom sx={{fontFamily: "Yatra One", }}>
-  //           Active Loans (3)
-  //         </Typography>
-  //       </Box>
-  //       {[1, 2, 3].map((item) => (
-  //         <LoanCard key={item}>
-  //           <StyledCard sx={{ height: '100%' }}>
-  //             <CardContent>
-  //               <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-  //                 <Typography variant="h5" component="div">
-  //                   Loan #{item}23
-  //                 </Typography>
-  //                 <StatusChip
-  //                   label="ACTIVE"
-  //                   status="active"
-  //                   size="small"
-  //                 />
-  //               </Box>
-                
-  //               <Divider sx={{ my: 2 }} />
-                
-  //               <Box sx={{ mb: 3 }}>
-  //                 <LoanInfoItem>
-  //                   <AccountBalanceIcon color="primary" />
-  //                   <Typography variant="body1">
-  //                     <strong>Amount Due:</strong> 0.5 ETH
-  //                   </Typography>
-  //                 </LoanInfoItem>
-                  
-  //                 <LoanInfoItem>
-  //                   <CalendarTodayIcon color="primary" />
-  //                   <Typography variant="body1">
-  //                     <strong>Duration:</strong> 3 months
-  //                   </Typography>
-  //                 </LoanInfoItem>
-  
-  //                 <LoanInfoItem>
-  //                   <AccessTimeIcon color="primary" />
-  //                   <Typography variant="body1">
-  //                     <strong>Created:</strong> {new Date().toLocaleDateString()}
-  //                   </Typography>
-  //                 </LoanInfoItem>
-  //               </Box>
-                
-  //               <Box sx={{ 
-  //                 display: "flex", 
-  //                 justifyContent: "space-between",
-  //                 alignItems: "center",
-  //                 mt: 2 
-  //               }}>
-  //                 <Typography variant="body2" color="text.secondary">
-  //                   You are the borrower
-  //                 </Typography>
-  //                 <Button
-  //                   variant="contained"
-  //                   color="primary"
-  //                   sx={{
-  //                     borderRadius: "20px",
-  //                     textTransform: "none",
-  //                     px: 3,
-  //                   }}
-  //                 >
-  //                   Repay Loan
-  //                 </Button>
-  //               </Box>
-  //             </CardContent>
-  //           </StyledCard>
-  //         </LoanCard>
-  //       ))}
-  //     </ActiveLoansContainer>
-  //   );
-  // };
-
   if (!activeLoans.length) {
     return (
       <Box
         display="flex"
         justifyContent="center"
         alignItems="center"
-        minHeight="47vh"
+        minHeight="calc(100vh - 80px)"
       >
         <Typography variant="h6" color="textSecondary">
           No active loans found
         </Typography>
       </Box>
     );
-    // return <DummyLoansCard />;  
   }
 
   return (

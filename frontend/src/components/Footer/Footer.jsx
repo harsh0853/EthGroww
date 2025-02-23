@@ -25,7 +25,7 @@ const StyledLink = styled(Link)({
   transition: "all 0.3s ease-in-out",
   "&:hover": {
     color: "#64ffda",
-    transform: "translateY(-2px)",
+    textShadow: "0 0 8px rgba(100, 255, 218, 0.5)", // Enhanced color effect
   },
   fontWeight: 400,
   cursor: "pointer",
@@ -50,25 +50,6 @@ const BoxRow = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   flex: 1,
   borderTop: '1px solid rgba(100, 255, 218, 0.1)',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    width: '150px',
-    height: '150px',
-    background: 'linear-gradient(45deg, #64ffda, #5ccfff)',
-    borderRadius: '50%',
-    filter: 'blur(50px)',
-    opacity: 0.2,
-    animation: 'moveGlow 15s infinite',
-  },
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    inset: 0,
-    background: 'rgba(10, 25, 47, 0.15)',
-    backdropFilter: 'blur(10px)',
-    zIndex: 0,
-  },
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
     gap: 30,
@@ -82,6 +63,7 @@ const SocialLink = styled(Link)({
   "&:hover": {
     color: "#64ffda",
     transform: "translateY(-2px)",
+    textShadow: "0 0 8px rgba(100, 255, 218, 0.5)", // Enhanced color effect
   },
   "& svg": {
     fontSize: "1.5rem",
@@ -99,10 +81,9 @@ const Footer = () => {
       sx={{
         py: 4,
         px: 2,
-        position: 'relative',
-        zIndex: 1,
       }}
     >
+
       <StackColumn>
         <FooterTitle text={"Contact Us"} />
         <FooterLink text={"ITER Bhubaneswar"} />
