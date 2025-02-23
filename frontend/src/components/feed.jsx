@@ -26,6 +26,7 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import TimerIcon from "@mui/icons-material/Timer";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import AddIcon from "@mui/icons-material/Add";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { ethers } from "ethers";
 import contractABI from "./contractABI.json";
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -381,20 +382,29 @@ const Feed = () => {
   }
 
   return (
-    <Box sx={{ padding: 3, backgroundColor: "#f5f5f5", minHeight: "41vh" }}>
+    <Box
+      sx={{
+        padding: 3,
+        backgroundColor: "transparent",
+        backdropFilter: "blur(10px)",
+        minHeight: "calc(100vh - 80px)", // Full viewport height minus navbar height
+        position: "relative",
+        zIndex: 1, // Ensure it's under the navbar if needed
+      }}
+    >
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 4,
+          marginTop: 11,
         }}
       >
         <Typography
           variant="h4"
           sx={{
             fontFamily: "Yatra One",
-            color: "#333",
+            color: "aliceblue",
           }}
         >
           Loan Requests
@@ -404,10 +414,13 @@ const Feed = () => {
           startIcon={<AddIcon />}
           onClick={handleAddLoan}
           sx={{
-            backgroundColor: "#28a745",
+            backgroundColor: "transparent",
+            border: "1px solid cyan",
             "&:hover": {
-              backgroundColor: "#218838",
+              backgroundColor: "cyan",
+              color: "black",
             },
+            color: "white",
           }}
         >
           Add Loan Request
@@ -534,10 +547,12 @@ const Feed = () => {
             padding: 2,
             maxWidth: "500px",
             width: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.1)", // Transparent background
+            backdropFilter: "blur(10px)", // Blurred background
           },
         }}
       >
-        <DialogTitle sx={{ fontFamily: "Yatra One", color: "#333" }}>
+        <DialogTitle sx={{ fontFamily: "Yatra One", color: "#fff" }}>
           Create New Loan Request
         </DialogTitle>
         <DialogContent>
@@ -562,6 +577,28 @@ const Feed = () => {
                 inputProps: {
                   step: "0.1",
                   min: "0",
+                },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#00ffff", // Cyan border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on focus
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  color: "#fff", // White input text color
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#00ffff", // Cyan label color
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#00ffff", // Cyan label color on focus
                 },
               }}
             />
@@ -595,8 +632,43 @@ const Feed = () => {
               value={newLoan.duration}
               onChange={handleInputChange}
               fullWidth
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      backgroundColor: "#333", // Gray background color
+                      color: "#00ffff", // Cyan text color
+                    },
+                  },
+                },
+                IconComponent: (props) => (
+                  <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#00ffff", // Cyan border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on focus
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  color: "#fff", // White input text color
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#00ffff", // Cyan label color
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#00ffff", // Cyan label color on focus
+                },
+              }}
             >
-              <MenuItem value={1}>1 months</MenuItem>
+              <MenuItem value={1}>1 month</MenuItem>
               <MenuItem value={2}>2 months</MenuItem>
               <MenuItem value={3}>3 months</MenuItem>
               <MenuItem value={4}>4 months</MenuItem>
@@ -617,6 +689,41 @@ const Feed = () => {
               value={newLoan.purpose}
               onChange={handleInputChange}
               fullWidth
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      backgroundColor: "#333", // Gray background color
+                      color: "#00ffff", // Cyan text color
+                    },
+                  },
+                },
+                IconComponent: (props) => (
+                  <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#00ffff", // Cyan border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#00ffff", // Cyan border color on focus
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  color: "#fff", // White input text color
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#00ffff", // Cyan label color
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#00ffff", // Cyan label color on focus
+                },
+              }}
             >
               <MenuItem value="Business Expansion">Business Expansion</MenuItem>
               <MenuItem value="Equipment Purchase">Equipment Purchase</MenuItem>
@@ -630,7 +737,7 @@ const Feed = () => {
           <Button
             onClick={handleAddClose}
             sx={{
-              color: "text.secondary",
+              color: "#00ffff", // Cyan color
               "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
             }}
           >
@@ -640,8 +747,9 @@ const Feed = () => {
             variant="contained"
             onClick={handleCreateRequest}
             sx={{
-              backgroundColor: "#28a745",
-              "&:hover": { backgroundColor: "#218838" },
+              backgroundColor: "#333", // Dark gray background
+              color: "#00ffff", // Cyan color
+              "&:hover": { backgroundColor: "#555" }, // Slightly lighter dark gray on hover
             }}
           >
             Create Request

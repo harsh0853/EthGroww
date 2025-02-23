@@ -18,8 +18,8 @@ import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { CircularProgress, Divider } from "@mui/material";
-import IconButton from '@mui/material/IconButton';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import IconButton from "@mui/material/IconButton";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 
 // const fadeIn = keyframes`
 //   from {
@@ -39,20 +39,19 @@ const glowEffect = keyframes`
 `;
 
 const UploadButton = styled(IconButton)(({ theme }) => ({
-  position: 'absolute',
+  position: "absolute",
   bottom: 8,
   right: 0,
-  backgroundColor: '#007bff',
-  color: 'white',
-  padding: '8px',
-  '&:hover': {
-    backgroundColor: '#0056b3',
+  backgroundColor: "#007bff",
+  color: "white",
+  padding: "8px",
+  "&:hover": {
+    backgroundColor: "#0056b3",
   },
-  '& .MuiSvgIcon-root': {
-    fontSize: '20px',
+  "& .MuiSvgIcon-root": {
+    fontSize: "20px",
   },
 }));
-
 
 const SidebarContainer = styled(Box)(({ theme, isOpen }) => ({
   position: "fixed",
@@ -96,9 +95,9 @@ const ModalOverlay = styled(Box)(({ isOpen }) => ({
 }));
 
 const AvatarContainer = styled(Box)({
-  position: 'relative',
-  marginTop: '2rem',
-  marginBottom: '1rem',
+  position: "relative",
+  marginTop: "2rem",
+  marginBottom: "1rem",
 });
 
 const ProfileAvatar = styled(Avatar)(({ theme }) => ({
@@ -192,7 +191,7 @@ const StatContainer = styled(Box)({
   justifyContent: "space-around",
   width: "100%",
   marginTop: ".5rem",
-  gap: ".8rem",
+  gap: ".5rem",
 });
 
 const StatBox = styled(Box)({
@@ -206,6 +205,7 @@ const StatBox = styled(Box)({
   "&:hover": {
     transform: "translateY(-3px)",
   },
+  color: "gray",
 });
 
 const CloseButton = styled(Button)({
@@ -247,8 +247,7 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
       setAvatarFile(file);
       const imageUrl = URL.createObjectURL(file);
       setAvatarUrl(imageUrl);
-      
-      // Optional: Upload to server
+
       handleAvatarUpload(file);
     }
   };
@@ -256,31 +255,31 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
   const handleAvatarUpload = async (file) => {
     try {
       const formData = new FormData();
-      formData.append('avatar', file);
+      formData.append("avatar", file);
 
       const response = await fetch(`${API_URL}/user/upload-avatar`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to upload avatar');
+        throw new Error("Failed to upload avatar");
       }
 
       setSnackbar({
         open: true,
-        message: 'Profile picture updated successfully!',
-        severity: 'success',
+        message: "Profile picture updated successfully!",
+        severity: "success",
       });
     } catch (error) {
-      console.error('Avatar upload error:', error);
+      console.error("Avatar upload error:", error);
       setSnackbar({
         open: true,
-        message: 'Failed to update profile picture',
-        severity: 'error',
+        message: "Failed to update profile picture",
+        severity: "error",
       });
     }
   };
@@ -290,7 +289,6 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
       try {
         setLoading(true);
 
-        // Get stored user data
         const storedUser = JSON.parse(localStorage.getItem("userData"));
         if (!storedUser?.ethAddress) {
           throw new Error("No wallet connected");
@@ -503,17 +501,19 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
             src={avatarUrl || userData?.avatarUrl}
             alt={userData?.name}
           >
-            {!avatarUrl && !userData?.avatarUrl && userData?.name
-              ?.split(" ")
-              .map((n) => n[0])
-              .join("")}
+            {!avatarUrl &&
+              !userData?.avatarUrl &&
+              userData?.name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")}
           </ProfileAvatar>
           <input
             accept="image/*"
             type="file"
             id="avatar-upload"
             onChange={handleAvatarChange}
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
           />
           <label htmlFor="avatar-upload">
             <UploadButton component="span">
@@ -533,8 +533,8 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
             {userData?.ethAddress
               ? `${userData.ethAddress.slice(
                   0,
-                  6
-                )}...${userData.ethAddress.slice(-4)}`
+                  8
+                )}...${userData.ethAddress.slice(-6)}`
               : "Not Connected"}
           </EthAddress>
         </InfoContainer>
