@@ -7,6 +7,7 @@ import { transporter } from "../config/nodemailer.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { client } from "../config/redis.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -24,16 +25,15 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  // Log the incoming request body for debugging
-  //console.log("Request body:", req.body);
 
-  const { email, username, password, ethAddress } = req.body;
+  const { email, username, password, ethAddress, otp } = req.body;
 
   // More detailed validation
   const missingFields = [];
   if (!email) missingFields.push("email");
   if (!username) missingFields.push("username");
   if (!password) missingFields.push("password");
+  if (!otp) missingFields.push("otp");
 
   if (missingFields.length > 0) {
     throw new ApiError(
@@ -43,11 +43,20 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Validate that fields are not empty strings after trimming
-  if ([email, username, password].some((field) => field.trim() === "")) {
+  if ([email, username, password, otp].some((field) => field.trim() === "")) {
     throw new ApiError(400, "All fields are required and cannot be empty");
   }
 
-  // Check if user already exists
+  const storedOTP = await client.get(`otp:${email}`);
+  //console.log(storedOTP);
+  
+  if(!storedOTP || storedOTP !== otp){
+    throw new ApiError(400, "Invalid or expired OTP");
+  }
+
+  await client.del(`otp${email}`);
+
+
   const existedUser = await User.findOne({
     $or: [
       { username: username.toLowerCase() },
@@ -253,7 +262,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findById(userId).select("-password");
-  //console.log(user);
 
   if (!user) {
     throw new ApiError(404, "User not found");
@@ -307,7 +315,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 //   try {
 //     await transporter.sendMail({
 //       from: `"EthGrow" <${process.env.EMAIL_USER}>`,
-//       to: updatedUser.email, 
+//       to: updatedUser.email,
 //       subject: updatedUser.isSubscribed
 //         ? "Welcome to Our Newsletter!"
 //         : "You have unsubscribed!",
@@ -321,15 +329,14 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 //   } catch (error) {
 //       throw new ApiError(500, "Something went wrong!")
 //   }
-  
+
 //   return res.status(200).json(
 //       new ApiResponse(
-//           200, 
+//           200,
 //           {isSubscribed: updatedUser.isSubscribed},
 //           "Subscription updated successfully")
 //   )
 // });
-
 
 const updateSubscription = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -338,7 +345,7 @@ const updateSubscription = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(404, "User doesn't exist");
   }
- 
+
   const newSubscriptionStatus = !user.isSubscribed;
 
   try {
@@ -355,23 +362,52 @@ const updateSubscription = asyncHandler(async (req, res) => {
         ? "<h2>Welcome!</h2><p>We are excited to have you with us!</p>"
         : "<h2>Goodbye!</h2><p>We're sorry to see you go. You can subscribe again anytime!</p>",
     });
-
   } catch (error) {
     user.isSubscribed = !user.isSubscribed;
     await user.save();
-    
+
     throw new ApiError(500, "Subscription update failed. Please try again.");
   }
-    user.isSubscribed = newSubscriptionStatus;
-    await user.save();
+  user.isSubscribed = newSubscriptionStatus;
+  await user.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { isSubscribed: user.isSubscribed },
+        "Subscription updated successfully"
+      )
+    );
+});
+
+const updateAvatar = asyncHandler(async (req, res) => {
+	const userId = req.user?._id;
+	if(!userId) throw new ApiError(400, "Id not found");
+
+  const user = await User.findById(userId);
+  if(!user) throw new ApiError(400, "User not found");
+	
+	const avatarLocalpath = req.file?.path;
+
+  //console.log(avatarLocalpath);
+  
+	if(!avatarLocalpath){
+		throw new ApiError(400, "Avatar file is required");
+	}
+
+	const avatar = await uploadOnCloudinary(avatarLocalpath);
+
+	if(!avatar) throw new ApiError(500, "failed to upload");
+
+  user.avatar = avatar?.url;
+  await user.save();
 
   return res.status(200).json(
-    new ApiResponse(
-      200,
-      { isSubscribed: user.isSubscribed },
-      "Subscription updated successfully"
-    )
-  );
+    new ApiResponse(200, user.avatar , "Avatar successfully saved")
+  )
+
 });
 
 export {
@@ -381,5 +417,6 @@ export {
   refreshAccessToken,
   getCurrentUser,
   updateAccountDetails,
-  updateSubscription
+  updateSubscription,
+  updateAvatar
 };

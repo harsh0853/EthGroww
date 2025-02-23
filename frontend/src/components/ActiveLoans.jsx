@@ -21,15 +21,13 @@ import contractABI from "./contractABI.json";
 const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
 const ActiveLoansContainer = styled(Box)({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: '24px',
-  padding: '24px',
-  backgroundColor: '#f5f5f5',
-  minHeight: 'calc(100vh - 80px)', // Full viewport height minus navbar height
-
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "24px",
+  padding: "24px",
+  backgroundColor: "#f5f5f5",
+  minHeight: "calc(100vh - 80px)", // Full viewport height minus navbar height
 });
-
 
 const LoanCard = styled(Grid)({
   flex: "1 1 calc(33.333% - 24px)",
@@ -207,7 +205,6 @@ const ActiveLoans = () => {
     );
   }
 
-
   // const DummyLoansCard = () => {
   //   return (
   //     <ActiveLoansContainer>
@@ -300,7 +297,6 @@ const ActiveLoans = () => {
     );
 
     // return <DummyLoansCard />;
-
   }
 
   return (
