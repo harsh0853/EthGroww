@@ -253,7 +253,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findById(userId).select("-password");
-  //console.log(user);
 
   if (!user) {
     throw new ApiError(404, "User not found");
@@ -383,7 +382,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
 	
 	const avatarLocalpath = req.file?.path;
 
-  console.log(avatarLocalpath);
+  //console.log(avatarLocalpath);
   
 	if(!avatarLocalpath){
 		throw new ApiError(400, "Avatar file is required");
@@ -397,7 +396,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
   await user.save();
 
   return res.status(200).json(
-    new ApiResponse(200, avatar , "Avatar successfully saved")
+    new ApiResponse(200, user.avatar , "Avatar successfully saved")
   )
 
 });
