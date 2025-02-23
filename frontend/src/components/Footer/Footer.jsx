@@ -1,46 +1,97 @@
 import React from "react";
 import { Box, Stack, styled, Typography } from "@mui/material";
+import { keyframes } from "@mui/system";
 import Link from "@mui/material/Link";
 import FooterTitle from "./FooterTitle";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import Newsletter from "./Newsletter";
+
+// Add keyframes for subtle animations
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const StyledLink = styled(Link)({
+  fontSize: "1rem",
+  color: "#ccd6f6",
+  textDecoration: "none",
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    color: "#64ffda",
+    transform: "translateY(-2px)",
+  },
+  fontWeight: 400,
+  cursor: "pointer",
+});
+
+const StackColumn = styled(Stack)(() => ({
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  alignItems: "center",
+  flex: 1,
+  gap: 12,
+  textAlign: "center",
+  animation: `${fadeIn} 0.5s ease-out forwards`,
+}));
+
+const BoxRow = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row",
+  background: 'rgba(10, 25, 47, 0.25)',
+  backdropFilter: 'blur(10px)',
+  position: 'relative',
+  overflow: 'hidden',
+  flex: 1,
+  borderTop: '1px solid rgba(100, 255, 218, 0.1)',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    width: '150px',
+    height: '150px',
+    background: 'linear-gradient(45deg, #64ffda, #5ccfff)',
+    borderRadius: '50%',
+    filter: 'blur(50px)',
+    opacity: 0.2,
+    animation: 'moveGlow 15s infinite',
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    background: 'rgba(10, 25, 47, 0.15)',
+    backdropFilter: 'blur(10px)',
+    zIndex: 0,
+  },
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column",
+    gap: 30,
+  },
+}));
+
+// Add social media link styling
+const SocialLink = styled(Link)({
+  color: "#ccd6f6",
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    color: "#64ffda",
+    transform: "translateY(-2px)",
+  },
+  "& svg": {
+    fontSize: "1.5rem",
+  },
+});
 
 const Footer = () => {
-  const StyledLink = styled(Link)({
-    fontSize: "1rem", // Increased from default
-    color: "#414141",
-    textDecoration: "none",
-    "&:hover": {
-      color: "orange",
-    },
-    fontWeight: 400,
-    cursor: "pointer",
-  });
-
   const FooterLink = ({ text }) => {
     return <StyledLink variant="body2">{text}</StyledLink>;
   };
-
-  const StackColumn = styled(Stack)(() => ({
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    flex: 1,
-    gap: 12,
-    textAlign: "center",
-  }));
-
-  const BoxRow = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "row",
-    backgroundColor: "#ededed",
-    flex: 1,
-    [theme.breakpoints.down("sm")]: {
-      flexDirection: "column",
-      gap: 30,
-    },
-  }));
 
   return (
     <BoxRow
@@ -48,7 +99,8 @@ const Footer = () => {
       sx={{
         py: 4,
         px: 2,
-        fontSize: "30px",
+        position: 'relative',
+        zIndex: 1,
       }}
     >
       <StackColumn>
@@ -74,41 +126,26 @@ const Footer = () => {
           maxWidth="100%"
           justifyContent="space-between"
         >
-          <Link
-            href="#"
-            variant="body2"
-            sx={{
-              color: "#414141",
-              "&:hover": {
-                color: "orange",
-                fontSize: "1rem", // Increased from default
-              },
-            }}
-          >
+          <SocialLink href="#" aria-label="Instagram">
             <InstagramIcon />
-          </Link>
-          <Link
-            href="#"
-            variant="body2"
-            sx={{
-              color: "#414141",
-              "&:hover": {
-                color: "orange",
-                fontSize: "1rem", // Increased from default
-              },
-            }}
-          >
+          </SocialLink>
+          <SocialLink href="#" aria-label="Facebook">
             <FacebookIcon />
-          </Link>
+          </SocialLink>
         </Stack>
-        <Typography variant="caption" component="p">
+        <Typography 
+          variant="caption" 
+          component="p" 
+          sx={{ 
+            color: '#ccd6f6',
+            opacity: 0.7 
+          }}
+        >
           &copy; 2025 MicroLoans Inc.
         </Typography>
       </StackColumn>
 
-      <StackColumn>
-        <Newsletter />
-      </StackColumn>
+
     </BoxRow>
   );
 };

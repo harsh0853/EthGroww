@@ -192,7 +192,7 @@ const StatContainer = styled(Box)({
   justifyContent: "space-around",
   width: "100%",
   marginTop: ".5rem",
-  gap: ".8rem",
+  gap: ".5rem",
 });
 
 const StatBox = styled(Box)({
@@ -206,6 +206,7 @@ const StatBox = styled(Box)({
   "&:hover": {
     transform: "translateY(-3px)",
   },
+  color: "gray",
 });
 
 const CloseButton = styled(Button)({
@@ -248,7 +249,6 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
       const imageUrl = URL.createObjectURL(file);
       setAvatarUrl(imageUrl);
       
-      // Optional: Upload to server
       handleAvatarUpload(file);
     }
   };
@@ -290,7 +290,6 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
       try {
         setLoading(true);
 
-        // Get stored user data
         const storedUser = JSON.parse(localStorage.getItem("userData"));
         if (!storedUser?.ethAddress) {
           throw new Error("No wallet connected");
@@ -531,10 +530,7 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
           <InfoLabel>Eth. Address</InfoLabel>
           <EthAddress onClick={handleCopyAddress}>
             {userData?.ethAddress
-              ? `${userData.ethAddress.slice(
-                  0,
-                  6
-                )}...${userData.ethAddress.slice(-4)}`
+              ? `${userData.ethAddress.slice(0,8)}...${userData.ethAddress.slice(-6)}`
               : "Not Connected"}
           </EthAddress>
         </InfoContainer>

@@ -11,6 +11,7 @@ const Title = ({ text, textAlign }) => {
       textAlign: textAlign,
       fontFamily: "Yatra One",
       fontStyle: "normal",
+      color: '#B8E6E5',
    }}
     >
       {text}

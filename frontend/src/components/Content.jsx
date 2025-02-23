@@ -40,7 +40,7 @@ const Content = () => {
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            py: 10,
+            py: 16,
             px: 2,
         }}
         >
