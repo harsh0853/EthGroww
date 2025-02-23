@@ -7,6 +7,7 @@ import { transporter } from "../config/nodemailer.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { client } from "../config/redis.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -24,16 +25,15 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  // Log the incoming request body for debugging
-  //console.log("Request body:", req.body);
 
-  const { email, username, password, ethAddress } = req.body;
+  const { email, username, password, ethAddress, otp } = req.body;
 
   // More detailed validation
   const missingFields = [];
   if (!email) missingFields.push("email");
   if (!username) missingFields.push("username");
   if (!password) missingFields.push("password");
+  if (!otp) missingFields.push("otp");
 
   if (missingFields.length > 0) {
     throw new ApiError(
@@ -43,11 +43,20 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Validate that fields are not empty strings after trimming
-  if ([email, username, password].some((field) => field.trim() === "")) {
+  if ([email, username, password, otp].some((field) => field.trim() === "")) {
     throw new ApiError(400, "All fields are required and cannot be empty");
   }
 
-  // Check if user already exists
+  const storedOTP = await client.get(`otp:${email}`);
+  //console.log(storedOTP);
+  
+  if(!storedOTP || storedOTP !== otp){
+    throw new ApiError(400, "Invalid or expired OTP");
+  }
+
+  await client.del(`otp${email}`);
+
+
   const existedUser = await User.findOne({
     $or: [
       { username: username.toLowerCase() },
