@@ -37,7 +37,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
     boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
   },
 }));
-const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 const AddLoanButton = styled(Button)(({ theme }) => ({
   borderRadius: "50px",
   padding: "12px 24px",
@@ -195,7 +195,7 @@ const Feed = () => {
 
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
-      //console.log("Transaction confirmed:", receipt.transactionHash);
+      console.log("Transaction confirmed:", receipt.transactionHash);
       console.log("Receipt:", receipt);
       console.log("Receipt:", receipt.logs);
 

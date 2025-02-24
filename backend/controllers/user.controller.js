@@ -25,7 +25,6 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-
   const { email, username, password, ethAddress, otp } = req.body;
 
   // More detailed validation
@@ -49,13 +48,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const storedOTP = await client.get(`otp:${email}`);
   //console.log(storedOTP);
-  
-  if(!storedOTP || storedOTP !== otp){
+
+  if (!storedOTP || storedOTP !== otp) {
     throw new ApiError(400, "Invalid or expired OTP");
   }
 
   await client.del(`otp${email}`);
-
 
   const existedUser = await User.findOne({
     $or: [
@@ -383,31 +381,30 @@ const updateSubscription = asyncHandler(async (req, res) => {
 });
 
 const updateAvatar = asyncHandler(async (req, res) => {
-	const userId = req.user?._id;
-	if(!userId) throw new ApiError(400, "Id not found");
+  const userId = req.user?._id;
+  if (!userId) throw new ApiError(400, "Id not found");
 
   const user = await User.findById(userId);
-  if(!user) throw new ApiError(400, "User not found");
-	
-	const avatarLocalpath = req.file?.path;
+  if (!user) throw new ApiError(400, "User not found");
+
+  const avatarLocalpath = req.file?.path;
 
   //console.log(avatarLocalpath);
-  
-	if(!avatarLocalpath){
-		throw new ApiError(400, "Avatar file is required");
-	}
 
-	const avatar = await uploadOnCloudinary(avatarLocalpath);
+  if (!avatarLocalpath) {
+    throw new ApiError(400, "Avatar file is required");
+  }
 
-	if(!avatar) throw new ApiError(500, "failed to upload");
+  const avatar = await uploadOnCloudinary(avatarLocalpath);
+
+  if (!avatar) throw new ApiError(500, "failed to upload");
 
   user.avatar = avatar?.url;
   await user.save();
 
-  return res.status(200).json(
-    new ApiResponse(200, user.avatar , "Avatar successfully saved")
-  )
-
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user.avatar, "Avatar successfully saved"));
 });
 
 export {
@@ -418,5 +415,5 @@ export {
   getCurrentUser,
   updateAccountDetails,
   updateSubscription,
-  updateAvatar
+  updateAvatar,
 };
