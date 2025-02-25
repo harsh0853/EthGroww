@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Box, 
-  Button, 
-  styled, 
-  Typography, 
-  Grid, 
+import {
+  Box,
+  Button,
+  styled,
+  Typography,
+  Grid,
   Stack,
   Alert,
   AlertTitle,
-  CircularProgress 
+  CircularProgress,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import headerImg from "../assets/eth6.png";
-import imgDetail from "../assets/eth5.jpeg";
-import imgDetail2 from "../assets/eth4.jpeg";
+import imgDetail from "../assets/Header 2.png";
+import imgDetail2 from "../assets/Header 3.png";
+import imgDetail3 from "../assets/Header 4.png";
 import Title from "./Title";
 import Paragraph from "./Paragraph";
+import {
+  MonetizationOn,
+  AccountTree,
+  AccountBalance,
+  SwapHoriz,
+  People,
+} from "@mui/icons-material";
 
 // Animations
 const tiltAnimation = `
@@ -38,63 +46,66 @@ const RotatingImage = styled("img")`
 
 // Update color constants
 const colors = {
-  primary: '#64ffda',    
+  primary: "#64ffda",
   text: {
-    primary: '#E0FAFF',  
-    secondary: '#91C3D0', 
-    accent: '#64ffda'    
+    primary: "#E0FAFF",
+    secondary: "#91C3D0",
+    darker: "#6B95A3",
+    accent: "#64ffda",
   },
   background: {
-    light: 'rgba(255, 255, 255, 0.03)',
-    lighter: 'rgba(255, 255, 255, 0.05)'
-  }
+    light: "rgba(255, 255, 255, 0.03)",
+    lighter: "rgba(255, 255, 255, 0.05)",
+  },
 };
 
 const CustomBox = styled(Box)(({ theme }) => ({
-  minHeight: '100vh',
-  display: 'flex',
-  justifyContent: 'center',
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
   gap: theme.spacing(2),
   paddingTop: theme.spacing(20),
-  position: 'relative',
-  background: 'linear-gradient(135deg, #0a192f 0%, #112240 50%, #020c1b 100%)',
-  overflow: 'hidden',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
+  position: "relative",
+  background: "linear-gradient(135deg, #0a192f 0%, #112240 50%, #020c1b 100%)",
+  overflow: "hidden",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
   },
 }));
 
 const PageWrapper = styled(Box)({
-  background: 'linear-gradient(135deg, #0a192f 0%, #112240 50%, #020c1b 100%)',
-  position: 'relative',
-  overflow: 'hidden',
+  background: "linear-gradient(135deg, #0a192f 0%, #112240 50%, #020c1b 100%)",
+  position: "relative",
+  overflow: "hidden",
 });
 
-const GlowingCircle = styled('div')(({ size = '150px', top, left, right, bottom, color }) => ({
-  position: 'absolute',
-  width: size,
-  height: size,
-  borderRadius: '50%',
-  background: color,
-  filter: 'blur(60px)',
-  opacity: 0.3,
-  top,
-  left,
-  right,
-  bottom,
-  zIndex: 1,
-}));
+const GlowingCircle = styled("div")(
+  ({ size = "150px", top, left, right, bottom, color }) => ({
+    position: "absolute",
+    width: size,
+    height: size,
+    borderRadius: "50%",
+    background: color,
+    filter: "blur(60px)",
+    opacity: 0.3,
+    top,
+    left,
+    right,
+    bottom,
+    zIndex: 1,
+  })
+);
 
 const BoxText = styled(Box)(({ theme }) => ({
   flex: "1",
   paddingLeft: theme.spacing(8),
-  borderRadius: '16px',
+  borderRadius: "16px",
   padding: theme.spacing(4),
-  transition: 'all 0.3s ease-in-out',
-  '&:hover': {
-    transform: 'translateX(15px)',
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    transform: "translateX(15px)",
   },
   [theme.breakpoints.down("md")]: {
     flex: "2",
@@ -108,17 +119,17 @@ const CustomGridItem = styled(Grid)({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
-  background: 'rgba(255, 255, 255, 0.05)',
-  backdropFilter: 'blur(20px)',
-  borderRadius: '16px',
-  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+  background: "rgba(255, 255, 255, 0.05)",
+  backdropFilter: "blur(20px)",
+  borderRadius: "16px",
+  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
 });
 
 const CustomTypography = styled(Typography)({
   fontSize: "1.3rem",
   textAlign: "start",
   lineHeight: "1.5",
-  color: colors.text.secondary, // Updated to lighter shade
+  color: colors.text.darker, // Updated to darker shade
   marginTop: "1.5rem",
   fontFamily: "Almendra",
   fontWeight: 400,
@@ -127,21 +138,19 @@ const CustomTypography = styled(Typography)({
 
 const NewsItem = styled("div")({
   gap: "5px",
-  padding: "15px",
-  background: 'rgba(255, 255, 255, 0.1)',
-  backdropFilter: 'blur(10px)',
-  borderRadius: '10px',
-  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-  '& h3': {
+  background: "rgba(255, 255, 255, 0.1)",
+  backdropFilter: "blur(10px)",
+  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+  "& h3": {
     marginTop: 2,
-    color: '#fff',
+    color: "#fff",
   },
-  '& a': {
-    color: '#64ffda',
-    textDecoration: 'none',
-    '&:hover': {
-      textDecoration: 'underline',
-      color: '#5ccfff',
+  "& a": {
+    color: "#64ffda",
+    textDecoration: "none",
+    "&:hover": {
+      textDecoration: "underline",
+      color: "#5ccfff",
     },
   },
 });
@@ -150,25 +159,25 @@ const NewsContainer = styled(Box)({
   width: "95%",
   padding: "2rem",
   margin: "3rem 0",
-  background: 'rgba(255, 255, 255, 0.05)',
-  backdropFilter: 'blur(10px)',
-  borderRadius: '16px',
-  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+  background: "rgba(255, 255, 255, 0.05)",
+  backdropFilter: "blur(10px)",
+  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+  gap: "5px",
 });
 
 // Update NewsAlert styling
 const NewsAlert = styled(Alert)({
   marginBottom: "2rem",
-  background: 'rgba(255, 255, 255, 0.05)',
-  backdropFilter: 'blur(10px)',
-  borderRadius: '10px',
-  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-  color: '#fff',
+  background: "rgba(255, 255, 255, 0.05)",
+  backdropFilter: "blur(10px)",
+  borderRadius: "10px",
+  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+  color: "#fff",
   "& .MuiAlert-message": {
     width: "100%",
   },
   "& .MuiAlert-icon": {
-    color: '#64ffda',
+    color: "#64ffda",
   },
   "& .MuiAlertTitle-root": {
     color: colors.text.primary,
@@ -178,21 +187,37 @@ const NewsAlert = styled(Alert)({
   },
   "& a": {
     color: colors.primary,
-    '&:hover': {
+    "&:hover": {
       color: colors.text.accent,
-    }
-  }
+    },
+  },
 });
 
 // Update buttons
 const StyledButton = styled(Button)({
   color: colors.text.primary,
   borderRadius: "2rem",
-  '&:hover': {
+  "&:hover": {
     backgroundColor: colors.background.lighter,
     color: colors.primary,
-  }
+  },
 });
+
+const FeatureBox = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  gap: "1.5rem",
+  padding: "2rem",
+  background: "transparent",
+  borderRadius: "16px",
+  transition: "all 0.3s ease-in-out",
+  position: "absolute",
+  bottom: 10,
+  left: 0,
+  right: 0,
+  color: "#FFFFFF",
+}));
 
 const Header = () => {
   const [news, setNews] = useState([]);
@@ -248,9 +273,9 @@ const Header = () => {
       <GlowingCircle size="250px" bottom="20%" right="10%" color="#5ccfff" />
       <GlowingCircle size="200px" top="40%" left="20%" color="#79fff7" />
 
-      {/* Keep your existing components structure */}
+      {/* Hero Section */}
       <CustomBox component="header">
-        <BoxText component="section">
+        <BoxText component="section" sx={{ height: "60vh" }}>
           <Typography
             variant="h2"
             component="h1"
@@ -352,19 +377,144 @@ const Header = () => {
         >
           <RotatingImage src={headerImg} alt="headerImg" />
         </Box>
+
+        <FeatureBox>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "nowrap",
+              gap: "1rem",
+              height: "auto",
+              alignSelf: "center",
+              px: 2,
+              "&::-webkit-scrollbar": {
+                height: "8px",
+              },
+              "&::-webkit-scrollbar-track": {
+                background: "rgba(255, 255, 255, 0.05)",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "#64ffda",
+                borderRadius: "4px",
+              },
+            }}
+          >
+            {[
+              {
+                title: "Total Value Locked",
+                value: "$133.96M",
+                icon: (
+                  <AccountBalance
+                    sx={{
+                      fontSize: "2rem",
+                      color: "#64ffda",
+                      filter: "drop-shadow(0 0 8px rgba(100, 255, 218, 0.6))",
+                    }}
+                  />
+                ),
+              },
+              {
+                title: "Active Loans",
+                value: "40.33K",
+                icon: (
+                  <MonetizationOn
+                    sx={{
+                      fontSize: "2rem",
+                      color: "#64ffda",
+                      filter: "drop-shadow(0 0 8px rgba(100, 255, 218, 0.6))",
+                    }}
+                  />
+                ),
+              },
+              {
+                title: "Network Users",
+                value: "631.42K+",
+                icon: (
+                  <People
+                    sx={{
+                      fontSize: "2rem",
+                      color: "#64ffda",
+                      filter: "drop-shadow(0 0 8px rgba(100, 255, 218, 0.6))",
+                    }}
+                  />
+                ),
+              },
+              {
+                title: "Supported Chains",
+                value: "10+",
+                icon: (
+                  <AccountTree
+                    sx={{
+                      fontSize: "2rem",
+                      color: "#64ffda",
+                      filter: "drop-shadow(0 0 8px rgba(100, 255, 218, 0.6))",
+                    }}
+                  />
+                ),
+              },
+            ].map((metric, index) => (
+              <Box
+                key={index}
+                sx={{
+                  p: 2,
+                  minWidth: "200px",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  backdropFilter: "blur(10px)",
+                  borderRadius: "16px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  transition: "all 0.3s ease-in-out",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "inset -2px 0 20px rgba(100, 255, 218, 0.2)",
+                    background: "rgba(255, 255, 255, 0.05)",
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    mb: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {metric.icon}
+                </Box>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    color: colors.text.primary,
+                    fontFamily: "Yatra One",
+                    fontSize: "1.2rem",
+                    fontWeight: 600,
+                    textAlign: "center",
+                    mb: 1,
+                  }}
+                >
+                  {metric.value}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: colors.text.darker,
+                    fontFamily: "Almendra",
+                    fontSize: "0.875rem",
+                    textAlign: "center",
+                  }}
+                >
+                  {metric.title}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </FeatureBox>
       </CustomBox>
 
-      <Grid
-        container
-        spacing={{ xs: 4, sm: 4, md: 0 }}
-        sx={{
-          py: 10,
-          px: 2,
-          background: 'transparent',
-          position: 'relative',
-          zIndex: 2,
-        }}
-      >
+      {/* Feature Section */}
+      <Grid container spacing={4} sx={{ mt: 4, bgcolor: "transparent" }}>
         <CustomGridItem item xs={12} sm={8} md={6} component="section">
           <Box
             component="article"
@@ -375,6 +525,10 @@ const Header = () => {
             <Title
               text={"Easily access affordable loans for micro-investments"}
               textAlign={"start"}
+              sx={{
+                color: colors.text.primary,
+                fontWeight: 600,
+              }}
             />
             <CustomTypography>
               Our blockchain-based microloans platform connects
@@ -387,15 +541,39 @@ const Header = () => {
         </CustomGridItem>
 
         <Grid item xs={12} sm={4} md={6}>
-          <img
-            src={imgDetail}
-            alt=""
-            style={{
-              width: "100%",
+          <Box
+            sx={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform 0.3s ease-in-out",
+              "&:hover": {
+                transform: "translateY(-10px)",
+              },
             }}
-          />
+          >
+            <img
+              src={imgDetail}
+              alt="Blockchain lending visualization"
+              style={{
+                width: "50%",
+                height: "100%",
+                objectFit: "cover",
+                filter: "drop-shadow(0 0 10px #00ffff)",
+                transition: "filter 0.3s ease-in-out",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.filter = "drop-shadow(0 0 20px #00ffff)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.filter = "drop-shadow(0 0 10px #00ffff)";
+              }}
+            />
+          </Box>
         </Grid>
-
+      </Grid>
+      <Grid container spacing={4} sx={{ mt: 4, bgcolor: "transparent" }}>
         <Grid
           item
           xs={12}
@@ -405,13 +583,36 @@ const Header = () => {
             order: { xs: 4, sm: 4, md: 3 },
           }}
         >
-          <img
-            src={imgDetail2}
-            alt=""
-            style={{
-              width: "100%",
+          <Box
+            sx={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform 0.3s ease-in-out",
+              "&:hover": {
+                transform: "translateY(-10px)",
+              },
             }}
-          />
+          >
+            <img
+              src={imgDetail2}
+              alt="Secure blockchain technology"
+              style={{
+                width: "50%",
+                height: "100%",
+                objectFit: "cover",
+                filter: "drop-shadow(0 0 10px #00ffff)",
+                transition: "filter 0.3s ease-in-out",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.filter = "drop-shadow(0 0 20px #00ffff)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.filter = "drop-shadow(0 0 10px #00ffff)";
+              }}
+            />
+          </Box>
         </Grid>
 
         <CustomGridItem
@@ -429,7 +630,14 @@ const Header = () => {
               px: 4,
             }}
           >
-            <Title text={"Trustworthy and secure lending"} textAlign={"start"} />
+            <Title
+              text={"Trustworthy and secure lending"}
+              textAlign={"start"}
+              sx={{
+                color: colors.text.primary,
+                fontWeight: 600,
+              }}
+            />
             <CustomTypography>
               Our blockchain technology ensures transparency and
               <br />
@@ -440,15 +648,77 @@ const Header = () => {
           </Box>
         </CustomGridItem>
       </Grid>
+      <Grid container spacing={4} sx={{ mt: 4, bgcolor: "transparent" }}>
+        <CustomGridItem item xs={12} sm={8} md={6} component="section">
+          <Box
+            component="article"
+            sx={{
+              px: 4,
+            }}
+          >
+            <Title
+              text={"Decentralized Financial Security"}
+              textAlign={"start"}
+              sx={{
+                color: colors.text.primary,
+                fontWeight: 600,
+              }}
+            />
+            <CustomTypography>
+              Your transactions are secured by Ethereum blockchain,
+              <br />
+              with immutable records and automated compliance,
+              <br />
+              ensuring a trustless and transparent lending ecosystem.
+            </CustomTypography>
+          </Box>
+        </CustomGridItem>
 
+        <Grid item xs={12} sm={4} md={6}>
+          <Box
+            sx={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform 0.3s ease-in-out",
+              "&:hover": {
+                transform: "translateY(-10px)",
+              },
+            }}
+          >
+            <img
+              src={imgDetail3}
+              alt="Blockchain lending visualization"
+              style={{
+                width: "30%",
+                height: "100%",
+                objectFit: "cover",
+                filter: "drop-shadow(0 0 10px #00ffff)",
+                transition: "filter 0.3s ease-in-out",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.filter = "drop-shadow(0 0 20px #00ffff)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.filter = "drop-shadow(0 0 10px #00ffff)";
+              }}
+            />
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* News Section */}
       <Grid item xs={12}>
         <NewsContainer>
-          <Title 
-            text={"Latest Blockchain News"} 
+          <Title
+            text={"Latest Blockchain News"}
             textAlign={"center"}
             sx={{
-              color: "#64ffda",
+              color: colors.text.primary,
               fontWeight: 600,
+              gap: 2,
+              paddingTop: 10,
             }}
           />
           {loading ? (
@@ -505,64 +775,65 @@ const Header = () => {
         </NewsContainer>
       </Grid>
 
-      <Stack 
-        component='section'
+      {/* Get in touch Section */}
+      <Stack
+        component="section"
         direction="column"
-        justifyContent='center'
-        alignItems='center'
+        justifyContent="center"
+        alignItems="center"
         sx={{
           my: 5,
           mx: 2,
           p: 5,
-          fontFamily: 'Yatra One',
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '16px',
-          position: 'relative',
+          fontFamily: "Yatra One",
+          background: "rgba(255, 255, 255, 0.05)",
+          backdropFilter: "blur(10px)",
+          borderRadius: "16px",
+          position: "relative",
           zIndex: 2,
-          '& h4': {
-            color: '#64ffda',
+          "& h4": {
+            color: colors.text.primary,
           },
-          '& p': {
-            color: '#a8b2d1',
+          "& p": {
+            color: colors.text.darker,
           },
         }}
       >
-        <Title 
-          text={'Blockchain-based Microloans'} 
-          textAlign={'center'}
-          variant='h4'
+        <Title
+          text={"Blockchain-based Microloans"}
+          textAlign={"center"}
+          variant="h4"
           sx={{ mt: 6 }}
         />
-        <Paragraph 
+        <Paragraph
           text={
-            'We are proud to offer blockchain-based microloans to help \
+            "We are proud to offer blockchain-based microloans to help \
             homebuyers overcome financial barriers. Our platform ensures \
             transparency, security, and efficiency in the loan process. \
-            Contact us to learn more about our blockchain-based microloans.'
+            Contact us to learn more about our blockchain-based microloans."
           }
-          maxWidth={'sm'}
+          maxWidth={"sm"}
           mx={0}
-          textAlign={'center'}
+          textAlign={"center"}
         />
-        <StyledButton 
-          component={Link} 
-          to={'/contact'}
-          variant="contained" 
+        <StyledButton
+          component={Link}
+          to={"/contact"}
+          variant="contained"
           type="submit"
           size="medium"
-          sx={{ 
-            fontSize: '0.9rem',
-            textTransform: 'capitalize', 
+          sx={{
+            fontSize: "0.9rem",
+            textTransform: "capitalize",
             py: 2,
             px: 4,
-            mt: 3, 
+            mt: 3,
             mb: 2,
             borderRadius: 0,
-            backgroundColor: '#14192d',
+            backgroundColor: "#14192d",
             "&:hover": {
-              backgroundColor: '#1e2a5a',
-            }
+              backgroundColor: "#1e2a5a",
+            },
           }}
         >
           Get in touch
