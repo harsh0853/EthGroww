@@ -140,7 +140,7 @@ const Login = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    Aadhar: "",
+    otp: "",
   });
   const [error, setError] = useState({ login: "", signup: "" });
   const navigate = useNavigate();
@@ -149,6 +149,7 @@ const Login = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [isSendOTP, setIsSendOTP] = useState(false);
 
   useEffect(() => {
     checkLoginStatus();
@@ -279,14 +280,6 @@ const Login = () => {
       return;
     }
 
-    if (!validateAadhar(signupData.Aadhar)) {
-      setError((prev) => ({
-        ...prev,
-        signup: "Please enter a valid 12-digit Aadhar number",
-      }));
-      return;
-    }
-
     // Connect wallet if not already connected
     if (!isWalletConnected) {
       const address = await connectWallet();
@@ -305,7 +298,7 @@ const Login = () => {
           username: signupData.name,
           email: signupData.email,
           password: signupData.password,
-          aadhar: signupData.Aadhar,
+          otp: signupData.otp,
           ethAddress: walletAddress,
         }),
       });
@@ -338,6 +331,27 @@ const Login = () => {
     }
   };
 
+  const handleOTPVerify = async () => {
+    setIsSendOTP(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/send-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: signupData.email,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "OTP verification failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const checkLoginStatus = async () => {
     try {
       const token = localStorage.getItem("userToken");
@@ -366,11 +380,6 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const validateAadhar = (aadhar) => {
-    const aadharRegex = /^\d{12}$/;
-    return aadharRegex.test(aadhar);
   };
 
   const WalletConnectButton = () => (
@@ -489,7 +498,7 @@ const Login = () => {
                       color: "#00ffff", // Cyan label color on focus
                     },
                   }}
-                />  
+                />
                 <button
                   type="submit"
                   style={{
@@ -499,15 +508,17 @@ const Login = () => {
                     cursor: isLoggedIn || isLoading ? "not-allowed" : "pointer",
                   }}
                   disabled={isLoggedIn || isLoading}
-                  onMouseOver={(e) =>
-                    !isLoggedIn &&
-                    !isLoading &&
-                    (e.target.style.backgroundColor = "#555") // Slightly lighter dark gray on hover
+                  onMouseOver={
+                    (e) =>
+                      !isLoggedIn &&
+                      !isLoading &&
+                      (e.target.style.backgroundColor = "#555") // Slightly lighter dark gray on hover
                   }
-                  onMouseOut={(e) =>
-                    !isLoggedIn &&
-                    !isLoading &&
-                    (e.target.style.backgroundColor = "#333") // Dark gray background color
+                  onMouseOut={
+                    (e) =>
+                      !isLoggedIn &&
+                      !isLoading &&
+                      (e.target.style.backgroundColor = "#333") // Dark gray background color
                   }
                 >
                   {isLoading
@@ -600,6 +611,7 @@ const Login = () => {
                     },
                   }}
                 />
+
                 <TextField
                   margin="normal"
                   required
@@ -666,27 +678,23 @@ const Login = () => {
                     },
                   }}
                 />
+                <button
+                  type="button"
+                  style={styles.button}
+                  onClick={handleOTPVerify}
+                  disabled={!signupData.email}
+                >
+                  Send OTP
+                </button>
                 <TextField
                   margin="normal"
-                  required
+                  disabled={!isSendOTP}
                   fullWidth
-                  name="Aadhar"
-                  label="Aadhar Number"
-                  id="aadhar"
-                  value={signupData.Aadhar}
+                  id="otp"
+                  label="OTP"
+                  name="otp"
+                  value={signupData.otp}
                   onChange={handleSignupChange}
-                  inputProps={{
-                    maxLength: 12,
-                    pattern: "\\d{12}",
-                  }}
-                  error={
-                    signupData.Aadhar && !validateAadhar(signupData.Aadhar)
-                  }
-                  helperText={
-                    signupData.Aadhar && !validateAadhar(signupData.Aadhar)
-                      ? "Please enter a valid 12-digit Aadhar number"
-                      : ""
-                  }
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": {
@@ -710,16 +718,13 @@ const Login = () => {
                     },
                   }}
                 />
+
                 <WalletConnectButton />
                 <button
                   type="submit"
                   style={styles.button}
-                  onMouseOver={(e) =>
-                    (e.target.style.backgroundColor = "#555") // Slightly lighter dark gray on hover
-                  }
-                  onMouseOut={(e) =>
-                    (e.target.style.backgroundColor = "#333") // Dark gray background color
-                  }
+                  onMouseOver={(e) => (e.target.style.backgroundColor = "#555")}
+                  onMouseOut={(e) => (e.target.style.backgroundColor = "#333")}
                 >
                   Sign Up
                 </button>
