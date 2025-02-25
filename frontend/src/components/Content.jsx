@@ -8,6 +8,11 @@ import {
     styled,
     Box,
     Stack,
+    Email,
+  Instagram,
+  Discord,
+  Facebook,
+  LinkedIn
 } from "@mui/material";
 // icons
 import SportsGymnasticsIcon from '@mui/icons-material/MonetizationOnTwoTone';
@@ -15,6 +20,12 @@ import LocalParkingIcon from '@mui/icons-material/PriceCheckTwoTone';
 import FastfoodOutlinedIcon from '@mui/icons-material/CurrencyBitcoin';
 import PoolOutlinedIcon from '@mui/icons-material/PriceChange';
 import WifiPasswordIcon from '@mui/icons-material/Savings';
+import {
+  Group as CommunityIcon,
+  YouTube as YouTubeIcon,
+  MenuBook as DocsIcon,
+  Forum as FeedbackIcon
+} from '@mui/icons-material';
 // carousel
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
@@ -399,8 +410,158 @@ const Content = () => {
                     >
                         {renderSlides}
                     </Carousel>
+                    
                 </Box>
             </Stack>
+
+            <Stack
+  direction="column"
+  justifyContent="center"
+  alignItems="center"
+  sx={{
+    py: 8,
+    px: 2,
+    display: { xs: 'flex' },
+  }}
+>
+  <Box
+    component="section"
+    sx={{
+      paddingBottom: 3,
+    }}
+  >
+    <Title 
+      text={'Join Our Community'}
+      textAlign={'center'}
+    />
+    <Paragraph 
+      text={
+        'Connect with our growing community of developers and users.\
+        Get support, share ideas, and stay updated with the latest developments.'
+      } 
+      maxWidth={'sm'}
+      mx={'auto'}
+      textAlign={'center'}
+    />
+  </Box>
+
+  <Grid 
+    container 
+    spacing={3} 
+    sx={{ 
+      maxWidth: 1200,
+      justifyContent: 'center',
+      mt: 2
+    }}
+  >
+    {[
+      {
+        icon: <CommunityIcon fontSize="large" />,
+        title: 'Community',
+        description: 'Join our Discord community with 30,000+ members',
+        buttonText: 'Join Discord',
+        link: 'https://discord.gg/your-invite'
+      },
+      {
+        icon: <YouTubeIcon fontSize="large" />,
+        title: 'YouTube',
+        description: 'Stay updated with product releases and tutorials',
+        buttonText: 'Watch Now',
+        link: 'https://youtube.com/your-channel'
+      },
+      {
+        icon: <DocsIcon fontSize="large" />,
+        title: 'Documentation',
+        description: 'Read our comprehensive guides and API docs',
+        buttonText: 'Read Docs',
+        link: '/documentation'
+      },
+      {
+        icon: <FeedbackIcon fontSize="large" />,
+        title: 'Feedback',
+        description: 'Help us improve by sharing your feedback',
+        buttonText: 'Give Feedback',
+        link: '/feedback'
+      }
+    ].map((item, index) => (
+      <TumblingGridItem item xs={12} sm={6} md={3} key={index}>
+        <Card
+          sx={{
+            minHeight: 280,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            textAlign: 'center',
+            backgroundColor: '#1a1a1a',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              backgroundColor: 'rgba(100, 255, 218, 0.1)',
+              boxShadow: '0 0 20px rgba(100, 255, 218, 0.3)',
+              transform: 'translateY(-5px)'
+            }
+          }}
+        >
+          <CardContent>
+            <IconButton
+              sx={{
+                color: '#4ac3b6',
+                transition: 'color 0.3s ease-in-out',
+                mb: 2,
+                '&:hover': {
+                  color: '#64ffda'
+                }
+              }}
+            >
+              {item.icon}
+            </IconButton>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                color: '#4ac3b6',
+                fontFamily: 'Yatra One',
+                mb: 2
+              }}
+            >
+              {item.title}
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#91C3D0',
+                fontFamily: 'Almendra',
+                mb: 3
+              }}
+            >
+              {item.description}
+            </Typography>
+            <IconButton
+              component="a"
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                color: '#4ac3b6',
+                border: '1px solid #4ac3b6',
+                borderRadius: 1,
+                px: 3,
+                '&:hover': {
+                  borderColor: '#64ffda',
+                  color: '#64ffda',
+                  backgroundColor: 'rgba(100, 255, 218, 0.1)'
+                }
+              }}
+            >
+              {item.buttonText}
+            </IconButton>
+          </CardContent>
+        </Card>
+      </TumblingGridItem>
+    ))}
+  </Grid>
+</Stack>
+
         </>
     );
 }
