@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.models.js";
 //import { Loan } from "../models/loan.models.js";
+import { transporter } from "../config/nodemailer.js";
 
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
@@ -24,7 +25,7 @@ const generateAccessAndRefreshToken = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   // Log the incoming request body for debugging
-  console.log("Request body:", req.body);
+  //console.log("Request body:", req.body);
 
   const { email, username, password, ethAddress } = req.body;
 
@@ -286,6 +287,93 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "account details updated successfully"));
 });
 
+// const updateSubscription = asyncHandler(async (req, res)=> {
+
+//   const userId = req.user._id;
+
+//   const updatedUser = await User.findByIdAndUpdate(
+//       userId,
+//       {$bit: {isSubscribed: {xor: 1 } } },
+//       {new : true}
+//   );
+
+//   if(!updatedUser){
+//       throw new ApiError(404, "User doesn't exist")
+//   }
+//   if (!updatedUser.email) {
+//     throw new ApiError(400, "User does not have an email registered.");
+//   }
+
+//   try {
+//     await transporter.sendMail({
+//       from: `"EthGrow" <${process.env.EMAIL_USER}>`,
+//       to: updatedUser.email, 
+//       subject: updatedUser.isSubscribed
+//         ? "Welcome to Our Newsletter!"
+//         : "You have unsubscribed!",
+//       text: updatedUser.isSubscribed
+//         ? "Thank you for subscribing to our updates."
+//         : "You have successfully unsubscribed from our updates.",
+//       html: updatedUser.isSubscribed
+//         ? "<h2>Welcome!</h2><p>We are excited to have you with us!</p>"
+//         : "<h2>Goodbye!</h2><p>We're sorry to see you go. You can subscribe again anytime!</p>",
+//     });
+//   } catch (error) {
+//       throw new ApiError(500, "Something went wrong!")
+//   }
+  
+//   return res.status(200).json(
+//       new ApiResponse(
+//           200, 
+//           {isSubscribed: updatedUser.isSubscribed},
+//           "Subscription updated successfully")
+//   )
+// });
+
+
+const updateSubscription = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User doesn't exist");
+  }
+ 
+  const newSubscriptionStatus = !user.isSubscribed;
+
+  try {
+    await transporter.sendMail({
+      from: `"EthGrow" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: user.isSubscribed
+        ? "Welcome to Our Newsletter!"
+        : "You have unsubscribed!",
+      text: user.isSubscribed
+        ? "Thank you for subscribing to our updates."
+        : "You have successfully unsubscribed from our updates.",
+      html: user.isSubscribed
+        ? "<h2>Welcome!</h2><p>We are excited to have you with us!</p>"
+        : "<h2>Goodbye!</h2><p>We're sorry to see you go. You can subscribe again anytime!</p>",
+    });
+
+  } catch (error) {
+    user.isSubscribed = !user.isSubscribed;
+    await user.save();
+    
+    throw new ApiError(500, "Subscription update failed. Please try again.");
+  }
+    user.isSubscribed = newSubscriptionStatus;
+    await user.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { isSubscribed: user.isSubscribed },
+      "Subscription updated successfully"
+    )
+  );
+});
+
 export {
   registerUser,
   loginUser,
@@ -293,4 +381,5 @@ export {
   refreshAccessToken,
   getCurrentUser,
   updateAccountDetails,
+  updateSubscription
 };

@@ -10,14 +10,26 @@ import { nanoid } from "nanoid";
 const createLoan = asyncHandler(async (req, res) => {
   try {
     console.log("Creating loan request body:", req.body);
-    const { amount, loanPayableAmount, duration, loanId, ethAddress } =
-      req.body;
+    const {
+      amount,
+      loanPayableAmount,
+      duration,
+      collateral,
+      loanId,
+      ethAddress,
+    } = req.body;
 
     // Validate inputs
-    if (!amount || !duration || !ethAddress || !loanPayableAmount) {
+    if (
+      !amount ||
+      !duration ||
+      !ethAddress ||
+      !loanPayableAmount ||
+      !collateral
+    ) {
       throw new ApiError(
         400,
-        "Amount, duration, and ethereum address are required"
+        "Amount, duration, collateral, and ethereum address are required"
       );
     }
 
@@ -34,6 +46,7 @@ const createLoan = asyncHandler(async (req, res) => {
       borrowerEthAddress: ethAddress,
       loanAmount: amount,
       loanPayableAmount: loanPayableAmount,
+      collateral: collateral,
       time: duration,
       isFunded: false,
       isRepaid: false,
