@@ -83,7 +83,7 @@ const NavbarContainer = styled(AppBar)(({ theme, collapsed }) => ({
   ...(collapsed && {
     right: 'auto',
     width: '60px',
-    height: '60px',
+    height: '50px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -361,7 +361,7 @@ const Navbar = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemButton
-                        onClick={handleProfileClick}
+                        onClick={() => setIsProfileOpen(!isProfileOpen)} // Toggle the profile
                         sx={commonListItemButtonStyle}
                       >
                         <ListItemText primary="Profile" />
@@ -399,6 +399,11 @@ const Navbar = () => {
           )}
         </StyledToolbar>
       </NavbarContainer>
+
+      <ProfileDashBoard 
+        isOpen={isProfileOpen} 
+        onClose={() => setIsProfileOpen(false)}
+      />
 
       <Drawer
         anchor="left"
@@ -472,18 +477,14 @@ const Navbar = () => {
               <ListItem>
                 <ListItemButton
                   onClick={() => {
-                    handleProfileClick();
-                    setIsMenuOpen(false);
+                    setIsProfileOpen(!isProfileOpen); // Toggle the profile
+                    setIsMenuOpen(false); // Close the menu
                   }}
                   sx={commonListItemButtonStyle}
                 >
                   <ListItemText primary="Profile" />
                 </ListItemButton>
               </ListItem>
-              <ProfileDashBoard
-                isOpen={isProfileOpen}
-                onClose={handleCloseProfile}
-              />
             </>
           )}
         </List>

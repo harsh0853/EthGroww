@@ -18,6 +18,8 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import contractABI from "./contractABI.json";
+import { useSmoothScroll } from '../hooks/useSmoothScroll';
+import { scrollToElement } from '../utils/smoothScroll';
 const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 
 const ActiveLoansContainer = styled(Box)({
@@ -25,8 +27,9 @@ const ActiveLoansContainer = styled(Box)({
   flexWrap: "wrap",
   gap: "24px",
   padding: "24px",
-  backgroundColor: "#f5f5f5",
-  minHeight: "calc(100vh - 80px)", // Full viewport height minus navbar height
+  backgroundColor: 'transparent',
+  backdropFilter: 'blur(10px)',
+  minHeight: "calc(100vh - 80px)",
 });
 
 const LoanCard = styled(Grid)({
@@ -45,13 +48,20 @@ const LoanCard = styled(Grid)({
 
 const StyledCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(2),
-  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  background: 'rgba(255, 255, 255, 0.05)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
   transition: "all 0.3s ease",
-  border: "1px solid #e0e0e0",
-  "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: '0 8px 32px rgba(100, 255, 218, 0.2)',
   },
+  '& .MuiTypography-root': {
+    color: '#E0FAFF',
+  },
+  '& .MuiTypography-secondary': {
+    color: '#91C3D0',
+  }
 }));
 
 const LoanInfoItem = styled(Box)({
@@ -68,6 +78,7 @@ const StatusChip = styled(Chip)(({ status }) => ({
 }));
 
 const ActiveLoans = () => {
+  useSmoothScroll();
   const [activeLoans, setActiveLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -177,6 +188,10 @@ const ActiveLoans = () => {
       console.error("Repay loan error:", error);
       alert(error.message || "Error repaying loan");
     }
+  };
+
+  const handleNavClick = (sectionId) => {
+    scrollToElement(sectionId);
   };
 
   if (loading) {
@@ -300,105 +315,124 @@ const ActiveLoans = () => {
   }
 
   return (
-    <ActiveLoansContainer>
-      <Box sx={{ width: "100%", mb: 4 }}>
-        <Typography variant="h4" gutterBottom sx={{ fontFamily: "Yatra One" }}>
-          Active Loans ({activeLoans.length})
-        </Typography>
-      </Box>
+    <Box
+      sx={{
+        overflowY: 'hidden',
+        scrollBehavior: 'smooth',
+      }}
+    >
+      <ActiveLoansContainer>
+        <Box sx={{ width: "100%", mb: 4 }}>
+          <Typography variant="h4" gutterBottom sx={{ 
+            fontFamily: "Yatra One",
+            color: '#E0FAFF',
+            '& span': {
+              background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }
+          }}>
+            Active Loans (<span>{activeLoans.length}</span>)
+          </Typography>
+        </Box>
 
-      {activeLoans.map((loan) => (
-        <LoanCard key={loan.loanId}>
-          <StyledCard sx={{ height: "100%" }}>
-            <CardContent>
-              <Box
-                sx={{
-                  mb: 2,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="h5" component="div">
-                  Loan #{loan.loanId}
-                </Typography>
-                <StatusChip label="ACTIVE" status="active" size="small" />
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Box sx={{ mb: 3 }}>
-                <LoanInfoItem>
-                  <AccountBalanceIcon color="primary" />
-                  <Typography variant="body1">
-                    <strong>Amount Due:</strong> {loan.loanPayableAmount} ETH
+        {activeLoans.map((loan) => (
+          <LoanCard key={loan.loanId}>
+            <StyledCard sx={{ height: "100%" }}>
+              <CardContent>
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography variant="h5" component="div">
+                    Loan #{loan.loanId}
                   </Typography>
-                </LoanInfoItem>
+                  <StatusChip label="ACTIVE" status="active" size="small" />
+                </Box>
 
-                <LoanInfoItem>
-                  <CalendarTodayIcon color="primary" />
-                  <Typography variant="body1">
-                    <strong>Duration:</strong> {loan.duration} months
+                <Divider sx={{ my: 2 }} />
+
+                <Box sx={{ mb: 3 }}>
+                  <LoanInfoItem>
+                    <AccountBalanceIcon color="primary" />
+                    <Typography variant="body1">
+                      <strong>Amount Due:</strong> {loan.loanPayableAmount} ETH
+                    </Typography>
+                  </LoanInfoItem>
+
+                  <LoanInfoItem>
+                    <CalendarTodayIcon color="primary" />
+                    <Typography variant="body1">
+                      <strong>Duration:</strong> {loan.duration} months
+                    </Typography>
+                  </LoanInfoItem>
+
+                  <LoanInfoItem>
+                    <AccessTimeIcon color="primary" />
+                    <Typography variant="body1">
+                      <strong>Created:</strong>{" "}
+                      {new Date(loan.createdAt).toLocaleDateString()}
+                    </Typography>
+                  </LoanInfoItem>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mt: 2,
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {localStorage.getItem("walletAddress") ===
+                    loan.lenderEthAddress
+                      ? "You are the lender"
+                      : "You are the borrower"}
                   </Typography>
-                </LoanInfoItem>
 
-                <LoanInfoItem>
-                  <AccessTimeIcon color="primary" />
-                  <Typography variant="body1">
-                    <strong>Created:</strong>{" "}
-                    {new Date(loan.createdAt).toLocaleDateString()}
-                  </Typography>
-                </LoanInfoItem>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mt: 2,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  {localStorage.getItem("walletAddress") ===
-                  loan.lenderEthAddress
-                    ? "You are the lender"
-                    : "You are the borrower"}
-                </Typography>
-
-                {localStorage.getItem("walletAddress") !==
-                loan.lenderEthAddress ? (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() =>
-                      repayLoan(loan.loanId, loan.loanPayableAmount)
-                    }
-                    sx={{
-                      borderRadius: "20px",
-                      textTransform: "none",
-                      px: 3,
-                    }}
-                  >
-                    Repay Loan
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() =>
-                      claimCollateral(loan.loanId, loan.collateral)
-                    }
-                  >
-                    Claim Collateral
-                  </Button>
-                )}
-              </Box>
-            </CardContent>
-          </StyledCard>
-        </LoanCard>
-      ))}
-    </ActiveLoansContainer>
+                  {localStorage.getItem("walletAddress") !==
+                  loan.lenderEthAddress ? (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() =>
+                        repayLoan(loan.loanId, loan.loanPayableAmount)
+                      }
+                      sx={{
+                        borderRadius: "20px",
+                        textTransform: "none",
+                        px: 3,
+                      }}
+                    >
+                      Repay Loan
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() =>
+                        claimCollateral(loan.loanId, loan.collateral)
+                      }
+                    >
+                      Claim Collateral
+                    </Button>
+                  )}
+                </Box>
+              </CardContent>
+            </StyledCard>
+          </LoanCard>
+        ))}
+      </ActiveLoansContainer>
+      <Button onClick={() => handleNavClick('targetSection')}>
+        Scroll to Section
+      </Button>
+    </Box>
   );
 };
 

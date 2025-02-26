@@ -21,136 +21,141 @@ import { CircularProgress, Divider } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 
-// const fadeIn = keyframes`
-//   from {
-//     opacity: 0;
-//     transform: translateX(20px);
-//   }
-//   to {
-//     opacity: 1;
-//     transform: translateX(0);
-//   }
-// `;
-
-const glowEffect = keyframes`
+// Remove the glowEffect keyframes animation
+// Delete or comment out this block
+/* const glowEffect = keyframes`
   0% { box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
   50% { box-shadow: 0 0 20px rgba(0, 123, 255, 0.8); }
   100% { box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
+`; */
+
+const slideIn = keyframes`
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 `;
 
-const UploadButton = styled(IconButton)(({ theme }) => ({
-  position: "absolute",
-  bottom: 8,
-  right: 0,
-  backgroundColor: "#007bff",
-  color: "white",
-  padding: "8px",
-  "&:hover": {
-    backgroundColor: "#0056b3",
-  },
-  "& .MuiSvgIcon-root": {
-    fontSize: "20px",
-  },
-}));
-
+// Update SidebarContainer styling
 const SidebarContainer = styled(Box)(({ theme, isOpen }) => ({
-  position: "fixed",
-  right: 0,
-  top: 0,
-  width: "380px",
-  height: "100vh",
-  backgroundColor: "#ffffff",
-  boxShadow: "-5px 0 15px rgba(0, 0, 0, 0.1)",
-  padding: "2rem",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  zIndex: 1300,
-  transform: isOpen ? "translateX(0)" : "translateX(100%)",
-  transition: "transform 0.3s ease-in-out",
-  overflowY: "auto",
-  "&::-webkit-scrollbar": {
-    width: "8px",
-  },
-  "&::-webkit-scrollbar-track": {
-    background: "#f1f1f1",
-  },
-  "&::-webkit-scrollbar-thumb": {
-    background: "#888",
-    borderRadius: "4px",
-  },
+  position: 'fixed',
+  right: '0px',
+  top: 0, // Change to 0 to touch the top
+  width: '380px',
+  height: '100vh', // Change to full height
+  backgroundColor: 'rgba(26, 32, 47, 0.95)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(100, 255, 218, 0.2)',
+  padding: '2rem',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  zIndex: 1400, // Increase z-index to be above navbar
+  transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+  transition: 'transform 0.3s ease-out',
+  overflowY: 'hidden',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+  '@media (max-width: 600px)': {
+    width: '100%',
+    right: 0,
+  }
 }));
 
-const ModalOverlay = styled(Box)(({ isOpen }) => ({
-  position: "fixed",
+// Add a backdrop for mobile
+const Backdrop = styled(Box)(({ isOpen }) => ({
+  position: 'fixed',
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
-  zIndex: 1200,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  backdropFilter: 'blur(3px)',
+  zIndex: 1100,
   opacity: isOpen ? 1 : 0,
-  visibility: isOpen ? "visible" : "hidden",
-  transition: "opacity 0.3s ease, visibility 0.3s ease",
+  visibility: isOpen ? 'visible' : 'hidden',
+  transition: 'opacity 0.3s ease-out, visibility 0.3s ease-out',
+  '@media (min-width: 600px)': {
+    display: 'none',
+  },
 }));
+
+const UploadButton = styled(IconButton)({
+  position: "absolute",
+  bottom: -10,
+  right: -10,
+  backgroundColor: "rgba(0, 255, 255, 0.1)",
+  backdropFilter: "blur(5px)",
+  border: "1px solid rgba(0, 255, 255, 0.3)",
+  color: "#00ffff",
+  padding: "8px",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    backgroundColor: "rgba(0, 255, 255, 0.2)",
+    transform: "scale(1.1)",
+  },
+});
 
 const AvatarContainer = styled(Box)({
   position: "relative",
   marginTop: "2rem",
-  marginBottom: "1rem",
+  marginBottom: "2rem",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
 });
 
-const ProfileAvatar = styled(Avatar)(({ theme }) => ({
-  top: 0,
-  width: "100px",
-  height: "100px",
-  marginBottom: "1rem",
-  border: "4px solid #007bff",
-  cursor: "pointer",
+const ProfileAvatar = styled(Avatar)({
+  width: "120px",
+  height: "120px",
+  border: "3px solid #00ffff",
+  boxShadow: "0 0 20px rgba(0, 255, 255, 0.3)",
   transition: "all 0.3s ease",
   "&:hover": {
-    transform: "scale(1.15)",
-    animation: `${glowEffect} 2s infinite`,
+    transform: "scale(1.05)",
+    boxShadow: "0 0 30px rgba(0, 255, 255, 0.5)",
   },
-}));
+});
 
 const InfoContainer = styled(Box)({
   width: "100%",
   marginBottom: "1rem",
-  padding: ".2rem",
-  backgroundColor: "#f8f9fa",
+  padding: "1rem",
+  backgroundColor: "rgba(255, 255, 255, 0.05)",
+  backdropFilter: "blur(5px)",
   borderRadius: "10px",
+  border: "1px solid rgba(0, 255, 255, 0.1)",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+  transition: "all 0.3s ease",
   "&:hover": {
-    transform: "translateY(-5px)",
-    boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 5px 15px rgba(0, 255, 255, 0.1)",
   },
 });
 
 const InfoLabel = styled(Typography)({
-  color: "#666",
-  fontSize: "1rem",
+  color: "#91C3D0",
+  fontSize: "0.9rem",
   fontWeight: 500,
   textTransform: "uppercase",
   letterSpacing: "1px",
-  flex: "0 0 40%", // This ensures the label takes up fixed space
 });
 
 const InfoValue = styled(Typography)({
-  color: "#333",
-  fontWeight: 600,
-  fontSize: "1.1rem",
-  wordBreak: "break-all",
-  lineHeight: 1.4,
-  flex: "0 0 60%", // This ensures the value takes up the remaining space
+  color: "#E0FAFF",
+  fontWeight: 500,
+  fontSize: "1rem",
   textAlign: "right",
-  "&:hover": {
-    color: "#007bff",
-  },
   transition: "color 0.3s ease",
+  "&:hover": {
+    color: "#00ffff",
+  },
 });
 
 const EthAddress = styled(Typography)({
@@ -186,26 +191,21 @@ const ScoreContainer = styled(Box)({
   },
 });
 
-const StatContainer = styled(Box)({
-  display: "flex",
-  justifyContent: "space-around",
+const CreditScoreContainer = styled(Box)({
   width: "100%",
-  marginTop: ".5rem",
-  gap: ".5rem",
-});
-
-const StatBox = styled(Box)({
-  flex: 1,
   padding: "1rem",
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  textAlign: "center",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  transition: "transform 0.3s ease",
+  backgroundColor: "transparent",
+  backdropFilter: "blur(5px)",
+  borderRadius: "10px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  transition: "all 0.3s ease",
   "&:hover": {
-    transform: "translateY(-3px)",
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 5px 15px rgba(0, 255, 255, 0.1)",
   },
-  color: "gray",
 });
 
 const CloseButton = styled(Button)({
@@ -216,10 +216,45 @@ const CloseButton = styled(Button)({
   width: "40px",
   height: "40px",
   borderRadius: "50%",
-  backgroundColor: "rgba(0, 0, 0, 0.1)",
-  color: "#666",
+  backgroundColor: "rgba(0, 255, 255, 0.1)",
+  color: "#00ffff",
+  border: "1px solid rgba(0, 255, 255, 0.3)",
+  zIndex: 11, // Ensure it's above other content
   "&:hover": {
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    backgroundColor: "rgba(0, 255, 255, 0.2)",
+    transform: "rotate(90deg)", // Add rotation effect
+    transition: "transform 0.3s ease-in-out",
+  },
+});
+
+const StyledCircularProgress = styled(CircularProgress)({
+  color: "#00ffff",
+  // Remove the animation property
+});
+
+// Add this styled component after other styled components
+const StatsContainer = styled(Box)({
+  width: "100%",
+  marginTop: "2rem",
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "1rem",
+});
+
+const StatBox = styled(Box)({
+  padding: "1rem",
+  backgroundColor: "rgba(255, 255, 255, 0.05)",
+  backdropFilter: "blur(5px)",
+  borderRadius: "10px",
+  border: "1px solid rgba(0, 255, 255, 0.1)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 5px 15px rgba(0, 255, 255, 0.1)",
   },
 });
 
@@ -492,7 +527,6 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
 
   return (
     <>
-      <ModalOverlay isOpen={isOpen} onClick={onClose} />
       <SidebarContainer isOpen={isOpen}>
         <CloseButton onClick={onClose}>×</CloseButton>
 
@@ -523,48 +557,34 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
         </AvatarContainer>
 
         <InfoContainer>
-          <InfoLabel>Name</InfoLabel>
+          <InfoLabel>Username</InfoLabel>
           <InfoValue>{userData?.name || "Anonymous User"}</InfoValue>
         </InfoContainer>
 
         <InfoContainer>
-          <InfoLabel>Eth. Address</InfoLabel>
-          <EthAddress onClick={handleCopyAddress}>
+          <InfoLabel>ETH Address</InfoLabel>
+          <InfoValue onClick={handleCopyAddress} sx={{ cursor: "pointer" }}>
             {userData?.ethAddress
-              ? `${userData.ethAddress.slice(
-                  0,
-                  8
-                )}...${userData.ethAddress.slice(-6)}`
+              ? `${userData.ethAddress.slice(0, 6)}...${userData.ethAddress.slice(-4)}`
               : "Not Connected"}
-          </EthAddress>
+          </InfoValue>
         </InfoContainer>
 
         <InfoContainer>
           <InfoLabel>Location</InfoLabel>
-          <InfoValue>
-            {userData?.location || "Location not available"}
-          </InfoValue>
+          <InfoValue>{userData?.location || "Not Available"}</InfoValue>
         </InfoContainer>
 
-        <Divider sx={{ width: "100%", my: 1 }} />
-
-        <ScoreContainer>
-          <CreditScoreIcon sx={{ fontSize: 40, color: "#007bff", mb: 1 }} />
-          <Typography variant="h5" gutterBottom>
+        <CreditScoreContainer>
+          <Typography variant="h6" sx={{ color: "#00ffff", mb: 2 }}>
             Credit Score
           </Typography>
           <Box sx={{ position: "relative", display: "inline-flex" }}>
-            <CircularProgress
+            <StyledCircularProgress
               variant="determinate"
               value={((userData?.creditScore || 0) / 850) * 100}
-              size={80}
+              size={100}
               thickness={4}
-              sx={{
-                color:
-                  (userData?.creditScore || 0) > 700 ? "#28a745" : "#dc3545",
-                backgroundColor: "#f5f5f5",
-                borderRadius: "50%",
-              }}
             />
             <Box
               sx={{
@@ -578,139 +598,39 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
                 justifyContent: "center",
               }}
             >
-              <Typography
-                variant="h6"
-                component="div"
-                color="text.primary"
-                sx={{ fontWeight: "bold" }}
-              >
+              <Typography variant="h5" sx={{ color: "#E0FAFF" }}>
                 {userData?.creditScore || 0}
               </Typography>
             </Box>
           </Box>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {(userData?.creditScore || 0) > 700 ? "Excellent" : "Fair"}
-          </Typography>
-        </ScoreContainer>
+        </CreditScoreContainer>
 
-        <Divider sx={{ width: "100%", my: 2 }} />
-
-        {/* Loan Statistics */}
-        <StatContainer>
+        <StatsContainer>
           <StatBox>
-            <AccountBalanceIcon sx={{ color: "#007bff", mb: 1 }} />
-            <Typography variant="h6">{userData?.totalLoans || 0}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Total Loans
+            <Typography variant="h4" sx={{ color: "#00ffff", mb: 1 }}>
+              {activeLoans.length}
             </Typography>
-          </StatBox>
-
-          <StatBox>
-            <TimelineIcon sx={{ color: "#28a745", mb: 1 }} />
-            <Typography variant="h6">{userData?.activeLoans || 0}</Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography sx={{ color: "#91C3D0", fontSize: "0.9rem", textAlign:'center' }}>
               Active Loans
             </Typography>
           </StatBox>
-
           <StatBox>
-            <CreditScoreIcon sx={{ color: "#dc3545", mb: 1 }} />
-            <Typography variant="h6">
-              {userData?.successRate?.toFixed(1) || 100}%
+            <Typography variant="h4" sx={{ color: "#00ffff", mb: 1 }}>
+              {userData?.totalLoans || 0}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography sx={{ color: "#91C3D0", fontSize: "0.9rem" }}>
+              Total Loans
+            </Typography>
+          </StatBox>
+          <StatBox>
+            <Typography variant="h4" sx={{ color: "#00ffff", mb: 1 }}>
+              {userData?.successRate || 100}%
+            </Typography>
+            <Typography sx={{ color: "#91C3D0", fontSize: "0.9rem" }}>
               Success Rate
             </Typography>
           </StatBox>
-        </StatContainer>
-
-        {/* Active Loans Section */}
-        <Typography variant="h6" sx={{ mt: 3, mb: 2, width: "100%" }}>
-          Active Loans ({userData?.activeLoans || 0})
-        </Typography>
-
-        {activeLoans.length > 0 ? (
-          activeLoans.map((loan) => (
-            <Box
-              key={loan.loanId}
-              sx={{
-                width: "100%",
-                p: 2,
-                mb: 2,
-                backgroundColor: "#f8f9fa",
-                borderRadius: "10px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              }}
-            >
-              <Typography variant="subtitle1">
-                Loan Amount: {loan.loanAmount} ETH
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Duration: {loan.time} months
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                sx={{ mt: 1 }}
-                onClick={() => handleRepayClick(loan)}
-              >
-                Repay Loan
-              </Button>
-            </Box>
-          ))
-        ) : (
-          <Typography variant="body1" color="text.secondary">
-            No active loans found
-          </Typography>
-        )}
-
-        {/* Repay Dialog */}
-        <Dialog
-          open={openRepayDialog}
-          onClose={() => setOpenRepayDialog(false)}
-        >
-          <DialogTitle>Repay Loan</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Repayment Amount (ETH)"
-              type="number"
-              fullWidth
-              value={repayAmount}
-              onChange={(e) => setRepayAmount(e.target.value)}
-              InputProps={{
-                inputProps: { step: "0.000000000000000001" },
-              }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenRepayDialog(false)}>Cancel</Button>
-            <Button
-              onClick={handleRepayLoan}
-              variant="contained"
-              color="primary"
-            >
-              Confirm Repayment
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
+        </StatsContainer>
       </SidebarContainer>
     </>
   );

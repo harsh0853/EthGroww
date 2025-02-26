@@ -9,9 +9,10 @@ import {
   Alert,
   AlertTitle,
   CircularProgress,
+  AppBar,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import headerImg from "../assets/eth6.png";
+import headerImg from "../assets/Main2.png";
 import imgDetail from "../assets/Header 2.png";
 import imgDetail2 from "../assets/Header 3.png";
 import imgDetail3 from "../assets/Header 4.png";
@@ -21,28 +22,54 @@ import {
   MonetizationOn,
   AccountTree,
   AccountBalance,
-  SwapHoriz,
   People,
 } from "@mui/icons-material";
 
 // Animations
-const tiltAnimation = `
-  @keyframes tilt {
-    0% { transform: perspective(1000px) rotateY(0deg); }
-    25% { transform: perspective(1000px) rotateY(30deg); }
-    50% { transform: perspective(1000px) rotateY(0deg); }
-    50% { transform: perspective(1000px) rotateY(-30deg); }
-    100% { transform: perspective(1000px) rotateY(0deg); }
+const floatAnimation = `
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+      filter: drop-shadow(0 20px 15px rgba(100, 205, 218, 0.6));
+    }
+    50% {
+      transform: translateY(-30px);
+      filter: drop-shadow(0 25px 25px rgba(100, 205, 218, 0.15));
+    }
+    100% {
+      transform: translateY(0px);
+      filter: drop-shadow(0 20px 15px rgba(100, 205, 218, 0.6));
+    }
   }
 `;
 
 // Styled Components
-const RotatingImage = styled("img")`
-  width: 80%;
-  animation: tilt 5s ease-in-out infinite alternate;
-  transform-style: preserve-3d;
-  ${tiltAnimation}
-`;
+const AnimatedImage = styled("img")(({ theme }) => ({
+  width: '80%',
+  borderRadius: '10px',
+  animation: 'float 3s ease-in-out infinite',
+  transition: 'all 0.3s ease-in-out',
+  transformStyle: 'preserve-3d',
+  '&:hover': {
+    transform: 'scale(1.05)',
+    filter: 'drop-shadow(0 20px 30px rgba(100, 255, 218, 0.5))',
+  },
+  [theme.breakpoints.down('md')]: {
+    width: '90%',
+    marginTop: '2rem',
+  }
+}));
+
+// Add this gradient text styling component
+const GradientText = styled('span')({
+  background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  display: 'inline-block',
+  textShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
+  fontFamily: 'Yatra One'
+});
 
 // Update color constants
 const colors = {
@@ -286,7 +313,7 @@ const Header = () => {
               fontStyle: "normal",
             }}
           >
-            Crypto-Powered Loans for a Better Tomorrow.
+            <GradientText>Crypto-Powered</GradientText> Loans for a Better Tomorrow.
           </Typography>
 
           <Typography
@@ -362,21 +389,42 @@ const Header = () => {
         </BoxText>
 
         <Box
-          sx={(theme) => ({
-            [theme.breakpoints.down("md")]: {
-              flex: "1",
-              paddingTop: "20px",
-              alignSelf: "center",
-            },
-            [theme.breakpoints.up("md")]: {
-              flex: "1",
-              paddingLeft: "100px",
-              alignSelf: "flex-center",
-            },
-          })}
-        >
-          <RotatingImage src={headerImg} alt="headerImg" />
-        </Box>
+  sx={(theme) => ({
+    [theme.breakpoints.down("md")]: {
+      flex: "1",
+      paddingTop: "20px",
+      alignSelf: "center",
+    },
+    [theme.breakpoints.up("md")]: {
+      flex: "1",
+      paddingLeft: "100px",
+      alignSelf: "flex-center",
+    },
+    position: 'relative',
+    zIndex: 2,
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      width: '80%',
+      height: '20px',
+      bottom: '-20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      background: 'radial-gradient(ellipse at center, rgba(100, 255, 218, 0.2) 0%, transparent 70%)',
+      borderRadius: '50%',
+      zIndex: 1,
+    }
+  })}
+>
+  <style>
+    {floatAnimation}
+  </style>
+  <AnimatedImage 
+    src={headerImg} 
+    alt="Ethereum Animation"
+    loading="eager"
+  />
+</Box>
 
         <FeatureBox>
           <Box
@@ -523,7 +571,11 @@ const Header = () => {
             }}
           >
             <Title
-              text={"Easily access affordable loans for micro-investments"}
+              text={
+                <>
+                  <GradientText>Easily access affordable loans</GradientText> for micro-investments
+                </>
+              }
               textAlign={"start"}
               sx={{
                 color: colors.text.primary,
@@ -631,7 +683,11 @@ const Header = () => {
             }}
           >
             <Title
-              text={"Trustworthy and secure lending"}
+              text={
+                <>
+                  <GradientText>Trustworthy</GradientText> and secure lending
+                </>
+              }
               textAlign={"start"}
               sx={{
                 color: colors.text.primary,
@@ -657,7 +713,11 @@ const Header = () => {
             }}
           >
             <Title
-              text={"Decentralized Financial Security"}
+              text={
+                <>
+                  <GradientText>Decentralized</GradientText> Financial Security
+                </>
+              }
               textAlign={"start"}
               sx={{
                 color: colors.text.primary,
@@ -712,7 +772,11 @@ const Header = () => {
       <Grid item xs={12}>
         <NewsContainer>
           <Title
-            text={"Latest Blockchain News"}
+            text={
+              <>
+                Latest <GradientText>Blockchain</GradientText> News
+              </>
+            }
             textAlign={"center"}
             sx={{
               color: colors.text.primary,
@@ -800,7 +864,11 @@ const Header = () => {
         }}
       >
         <Title
-          text={"Blockchain-based Microloans"}
+          text={
+            <>
+              <GradientText>Blockchain-based Microloans</GradientText>
+            </>
+          }
           textAlign={"center"}
           variant="h4"
           sx={{ mt: 6 }}
