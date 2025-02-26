@@ -11,12 +11,12 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { sendOTPEmail } from "../controllers/sendOTP.js";
+// import { sendOTPEmail } from "../controllers/sendOTP.js";
 
 const router = Router();
 
 router.route("/register").post(registerUser);
-router.route("/send-otp").post(sendOTPEmail);
+// router.route("/send-otp").post(sendOTPEmail);
 router.route("/login").post(loginUser);
 
 // secured routes

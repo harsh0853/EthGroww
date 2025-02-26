@@ -7,7 +7,7 @@ import { transporter } from "../config/nodemailer.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { client } from "../config/redis.js";
+// import { client } from "../config/redis.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {

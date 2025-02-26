@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   TextField,
   MenuItem,
-  InputAdornment,
+  // InputAdornment,
   Snackbar,
   Alert,
 } from "@mui/material";
@@ -12,7 +12,7 @@ import {
   CardContent,
   Typography,
   Box,
-  Chip,
+  // Chip,
   Avatar,
   Button,
   styled,
@@ -21,6 +21,7 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  Container,
 } from "@mui/material";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import TimerIcon from "@mui/icons-material/Timer";
@@ -29,6 +30,8 @@ import AddIcon from "@mui/icons-material/Add";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { ethers } from "ethers";
 import contractABI from "./contractABI.json";
+import { useSmoothScroll } from '../hooks/useSmoothScroll';
+
 const StyledCard = styled(Card)(({ theme }) => ({
   margin: "10px",
   transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
@@ -37,6 +40,21 @@ const StyledCard = styled(Card)(({ theme }) => ({
     boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
   },
 }));
+const GlassCard = styled(StyledCard)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.05)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  '& .MuiCardContent-root': {
+    color: '#E0FAFF',
+  },
+  '& .MuiTypography-root': {
+    color: '#E0FAFF',
+  },
+  '& .MuiTypography-secondary': {
+    color: '#91C3D0',
+  }
+}));
+
 const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 const AddLoanButton = styled(Button)(({ theme }) => ({
   borderRadius: "50px",
@@ -50,6 +68,8 @@ const AddLoanButton = styled(Button)(({ theme }) => ({
 }));
 
 const Feed = () => {
+  useSmoothScroll();
+  
   const [loanRequests, setLoanRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedLoan, setSelectedLoan] = useState(null);
@@ -139,7 +159,7 @@ const Feed = () => {
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      const userAddress = await signer.getAddress();
+      // const userAddress = await signer.getAddress();
       const userData = JSON.parse(localStorage.getItem("userData"));
 
       if (!userData || !userData.ethAddress) {
@@ -195,7 +215,7 @@ const Feed = () => {
 
       console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
-      console.log("Transaction confirmed:", receipt.transactionHash);
+      console.log("Transaction xed:", receipt.transactionHash);
       console.log("Receipt:", receipt);
       console.log("Receipt:", receipt.logs);
 
@@ -290,7 +310,7 @@ const Feed = () => {
       });
 
       console.log("Transaction sent:", tx.hash);
-      const receipt = await tx.wait();
+      // const receipt = await tx.wait();
       //console.log("Transaction confirmed:", receipt.transactionHash);
 
       // Update database after successful blockchain transaction
@@ -381,447 +401,613 @@ const Feed = () => {
     );
   }
 
+  const dummyLoanRequest = {
+    loanId: "123",
+    borrowerEthAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    loanAmount: 5.5,
+    creditScore: 750,
+    duration: 6,
+    isFunded: false
+  };
+
   return (
-    <Box
+    <Container
       sx={{
-        padding: 3,
-        backgroundColor: "transparent",
-        backdropFilter: "blur(10px)",
-        minHeight: "calc(100vh - 80px)", // Full viewport height minus navbar height
-        position: "relative",
-        zIndex: 1, // Ensure it's under the navbar if needed
+        overflowY: 'hidden',
+        scrollBehavior: 'smooth',
+        // ...existing styles
       }}
     >
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: 11,
+          padding: 3,
+          backgroundColor: "transparent",
+          backdropFilter: "blur(10px)",
+          minHeight: "calc(100vh - 80px)", // Full viewport height minus navbar height
+          position: "relative",
+          zIndex: 1, // Ensure it's under the navbar if needed
         }}
       >
-        <Typography
-          variant="h4"
+        <Box
           sx={{
-            fontFamily: "Yatra One",
-            color: "aliceblue",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 11,
           }}
         >
-          Loan Requests
-        </Typography>
-        <AddLoanButton
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddLoan}
-          sx={{
-            backgroundColor: "transparent",
-            border: "1px solid cyan",
-            "&:hover": {
-              backgroundColor: "cyan",
-              color: "black",
-            },
-            color: "white",
-          }}
-        >
-          Add Loan Request
-        </AddLoanButton>
-      </Box>
+          <Typography
+            variant="h4"
+            sx={{
+              fontFamily: "Yatra One",
+              color: "#00ffff", // Changed to cyan
+              textShadow: '0 0 10px rgba(0, 255, 255, 0.3)' // Added glow effect
+            }}
+          >
+            Loan Requests
+          </Typography>
+          <AddLoanButton
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddLoan}
+            sx={{
+              backgroundColor: "transparent",
+              border: "1px solid cyan",
+              "&:hover": {
+                backgroundColor: "cyan",
+                color: "black",
+              },
+              color: "white",
+            }}
+          >
+            Add Loan Request
+          </AddLoanButton>
+        </Box>
 
-      {/* Loan Requests Grid */}
-      <Grid container spacing={3} sx={{ maxWidth: "1200px", margin: "0 auto" }}>
-        {loanRequests.length > 0 ? (
-          loanRequests.map((request) => (
-            <Grid item xs={12} sm={6} md={4} key={request.loanId}>
-              <StyledCard>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: 2,
-                    }}
-                  >
-                    <Avatar sx={{ marginRight: 2 }} />
-                    <Box>
-                      <Typography variant="h6">
-                        Loan #{request.loanId}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {request.borrowerEthAddress.slice(0, 20)}...
-                        {request.borrowerEthAddress.slice(-4)}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: 1,
-                    }}
-                  >
-                    <AccountBalanceIcon
-                      sx={{ marginRight: 1, color: "#007bff" }}
-                    />
-                    <Typography>
-                      ${request.loanAmount.toLocaleString()}
+        {/* Loan Requests Grid */}
+        <Grid container spacing={3} sx={{ maxWidth: "1200px", margin: "0 auto", mb: 4 }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <GlassCard>
+              <CardContent>
+                <Box sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: 2,
+                }}>
+                  <Avatar sx={{ 
+                    marginRight: 2,
+                    background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
+                  }} />
+                  <Box>
+                    <Typography variant="h6">
+                      Loan #{dummyLoanRequest.loanId}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#91C3D0' }}>
+                      {dummyLoanRequest.borrowerEthAddress.slice(0, 20)}...
+                      {dummyLoanRequest.borrowerEthAddress.slice(-4)}
                     </Typography>
                   </Box>
+                </Box>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: 1,
-                    }}
-                  >
-                    <CreditScoreIcon
-                      sx={{ marginRight: 1, color: "#28a745" }}
-                    />
-                    <Typography>Credit Score: {request.creditScore}</Typography>
-                  </Box>
+                <Box sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: 1,
+                }}>
+                  <AccountBalanceIcon sx={{ marginRight: 1, color: "#64ffda" }} />
+                  <Typography sx={{ color: '#E0FAFF' }}>
+                    ${dummyLoanRequest.loanAmount.toLocaleString()} ETH
+                  </Typography>
+                </Box>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: 2,
-                    }}
-                  >
-                    <TimerIcon sx={{ marginRight: 1, color: "#dc3545" }} />
-                    <Typography>{request.duration} months</Typography>
-                  </Box>
+                <Box sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: 1,
+                }}>
+                  <CreditScoreIcon sx={{ marginRight: 1, color: "#28a745" }} />
+                  <Typography>Credit Score: {dummyLoanRequest.creditScore}</Typography>
+                </Box>
 
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={() => handleFundClick(request)}
-                    disabled={
-                      request.isFunded ||
-                      (userData &&
-                        request.borrowerEthAddress.toLowerCase() ===
-                          userData.ethAddress.toLowerCase())
-                    }
-                    sx={{
-                      backgroundColor: request.isFunded ? "#6c757d" : "#007bff",
-                      "&:hover": {
-                        backgroundColor: request.isFunded
-                          ? "#6c757d"
-                          : "#0056b3",
-                      },
-                    }}
-                  >
-                    {request.isFunded
-                      ? "Funded"
-                      : userData &&
-                        request.borrowerEthAddress.toLowerCase() ===
-                          userData.ethAddress.toLowerCase()
-                      ? "Your Loan"
-                      : "Fund Now"}
-                  </Button>
-                </CardContent>
-              </StyledCard>
-            </Grid>
-          ))
-        ) : (
-          <Grid item xs={12}>
-            <Box sx={{ textAlign: "center", py: 4 }}>
-              <Typography variant="h6" color="text.secondary">
-                No loan requests available
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Be the first to create a loan request!
-              </Typography>
-            </Box>
+                <Box sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: 2,
+                }}>
+                  <TimerIcon sx={{ marginRight: 1, color: "#dc3545" }} />
+                  <Typography>{dummyLoanRequest.duration} months</Typography>
+                </Box>
+
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={() => handleFundClick(dummyLoanRequest)}
+                  sx={{
+                    backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                    backdropFilter: 'blur(5px)',
+                    border: '1px solid rgba(100, 255, 218, 0.3)',
+                    color: '#64ffda',
+                    transition: 'all 0.3s ease-in-out',
+                    '&:hover': {
+                      backgroundColor: 'rgba(100, 255, 218, 0.2)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
+                    },
+                  }}
+                >
+                  Fund Now
+                </Button>
+              </CardContent>
+            </GlassCard>
           </Grid>
-        )}
-      </Grid>
+          {loanRequests.length > 0 ? (
+            loanRequests.map((request) => (
+              <Grid item xs={12} sm={6} md={4} key={request.loanId}>
+                <GlassCard>
+                  <CardContent>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: 2,
+                      }}
+                    >
+                      <Avatar sx={{ 
+                        marginRight: 2,
+                        background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
+                      }} />
+                      <Box>
+                        <Typography variant="h6" sx={{fontFamily:'Yatra One'}}>
+                          Loan #{request.loanId}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#91C3D0' }}>
+                          {request.borrowerEthAddress.slice(0, 20)}...
+                          {request.borrowerEthAddress.slice(-4)}
+                        </Typography>
+                      </Box>
+                    </Box>
 
-      {/* Add Loan Dialog */}
-      <Dialog
-        open={openAddDialog}
-        onClose={handleAddClose}
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            padding: 2,
-            maxWidth: "500px",
-            width: "100%",
-            backgroundColor: "rgba(255, 255, 255, 0.1)", // Transparent background
-            backdropFilter: "blur(10px)", // Blurred background
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontFamily: "Yatra One", color: "#fff" }}>
-          Create New Loan Request
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
-            <TextField
-              name="amount"
-              label="Loan Amount (ETH)"
-              type="number"
-              value={newLoan.amount}
-              onChange={(e) => {
-                const value = e.target.value;
-                // Allow only valid numbers with up to 18 decimal places
-                if (value === "" || /^\d*\.?\d{0,18}$/.test(value)) {
-                  setNewLoan((prev) => ({
-                    ...prev,
-                    amount: value,
-                  }));
-                }
-              }}
-              fullWidth
-              InputProps={{
-                inputProps: {
-                  step: "0.1",
-                  min: "0",
-                },
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "#00ffff", // Cyan border color
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#00ffff", // Cyan border color on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#00ffff", // Cyan border color on focus
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "#fff", // White input text color
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#00ffff", // Cyan label color
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#00ffff", // Cyan label color on focus
-                },
-              }}
-            />
-            <TextField
-              name="collateral"
-              label="Loan Collateral (ETH)"
-              type="number"
-              value={newLoan.collateral}
-              onChange={(e) => {
-                const value = e.target.value;
-                // Allow only valid numbers with up to 18 decimal places
-                if (value === "" || /^\d*\.?\d{0,18}$/.test(value)) {
-                  setNewLoan((prev) => ({
-                    ...prev,
-                    collateral: value,
-                  }));
-                }
-              }}
-              fullWidth
-              InputProps={{
-                inputProps: {
-                  step: "0.1",
-                  min: "0",
-                },
-              }}
-            />
-            <TextField
-              name="duration"
-              label="Loan Duration"
-              select
-              value={newLoan.duration}
-              onChange={handleInputChange}
-              fullWidth
-              SelectProps={{
-                MenuProps: {
-                  PaperProps: {
-                    sx: {
-                      backgroundColor: "#333", // Gray background color
-                      color: "#00ffff", // Cyan text color
-                    },
-                  },
-                },
-                IconComponent: (props) => (
-                  <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
-                ),
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "#00ffff", // Cyan border color
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#00ffff", // Cyan border color on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#00ffff", // Cyan border color on focus
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "#fff", // White input text color
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#00ffff", // Cyan label color
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#00ffff", // Cyan label color on focus
-                },
-              }}
-            >
-              <MenuItem value={1}>1 month</MenuItem>
-              <MenuItem value={2}>2 months</MenuItem>
-              <MenuItem value={3}>3 months</MenuItem>
-              <MenuItem value={4}>4 months</MenuItem>
-              <MenuItem value={5}>5 months</MenuItem>
-              <MenuItem value={6}>6 months</MenuItem>
-              <MenuItem value={7}>7 months</MenuItem>
-              <MenuItem value={8}>8 months</MenuItem>
-              <MenuItem value={9}>9 months</MenuItem>
-              <MenuItem value={10}>10 months</MenuItem>
-              <MenuItem value={11}>11 months</MenuItem>
-              <MenuItem value={12}>12 months</MenuItem>
-            </TextField>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: 1,
+                      }}
+                    >
+                      <AccountBalanceIcon sx={{ marginRight: 1, color: "#64ffda" }} />
+                      <Typography sx={{ color: '#E0FAFF' }}>
+                        ${request.loanAmount.toLocaleString()}
+                      </Typography>
+                    </Box>
 
-            <TextField
-              name="purpose"
-              label="Loan Purpose"
-              select
-              value={newLoan.purpose}
-              onChange={handleInputChange}
-              fullWidth
-              SelectProps={{
-                MenuProps: {
-                  PaperProps: {
-                    sx: {
-                      backgroundColor: "#333", // Gray background color
-                      color: "#00ffff", // Cyan text color
-                    },
-                  },
-                },
-                IconComponent: (props) => (
-                  <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
-                ),
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "#00ffff", // Cyan border color
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#00ffff", // Cyan border color on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#00ffff", // Cyan border color on focus
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "#fff", // White input text color
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#00ffff", // Cyan label color
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#00ffff", // Cyan label color on focus
-                },
-              }}
-            >
-              <MenuItem value="Business Expansion">Business Expansion</MenuItem>
-              <MenuItem value="Equipment Purchase">Equipment Purchase</MenuItem>
-              <MenuItem value="Working Capital">Working Capital</MenuItem>
-              <MenuItem value="Inventory">Inventory</MenuItem>
-              <MenuItem value="Other">Other</MenuItem>
-            </TextField>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ padding: 2 }}>
-          <Button
-            onClick={handleAddClose}
-            sx={{
-              color: "#00ffff", // Cyan color
-              "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleCreateRequest}
-            sx={{
-              backgroundColor: "#333", // Dark gray background
-              color: "#00ffff", // Cyan color
-              "&:hover": { backgroundColor: "#555" }, // Slightly lighter dark gray on hover
-            }}
-          >
-            Create Request
-          </Button>
-        </DialogActions>
-      </Dialog>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: 1,
+                      }}
+                    >
+                      <CreditScoreIcon
+                        sx={{ marginRight: 1, color: "#28a745" }}
+                      />
+                      <Typography>Credit Score: {request.creditScore}</Typography>
+                    </Box>
 
-      {/* Fund Confirmation Dialog */}
-      <Dialog
-        open={openDialog}
-        onClose={handleClose}
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            padding: 2,
-            maxWidth: "400px",
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontFamily: "Yatra One", color: "#333" }}>
-          Confirm Funding
-        </DialogTitle>
-        <DialogContent>
-          {selectedLoan && (
-            <Box sx={{ my: 2 }}>
-              <Typography>Amount: ${selectedLoan.loanAmount}</Typography>
-              <Typography>Duration: {selectedLoan.time} months</Typography>
-              <Typography>
-                Borrower: {selectedLoan.borrowerEthAddress}
-              </Typography>
-            </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: 2,
+                      }}
+                    >
+                      <TimerIcon sx={{ marginRight: 1, color: "#dc3545" }} />
+                      <Typography>{request.duration} months</Typography>
+                    </Box>
+
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      onClick={() => handleFundClick(request)}
+                      disabled={
+                        request.isFunded ||
+                        (userData &&
+                          request.borrowerEthAddress.toLowerCase() ===
+                            userData.ethAddress.toLowerCase())
+                      }
+                      sx={{
+                        backgroundColor: request.isFunded ? "#6c757d" : "#007bff",
+                        "&:hover": {
+                          backgroundColor: request.isFunded
+                            ? "#6c757d"
+                            : "#0056b3",
+                        },
+                      }}
+                    >
+                      {request.isFunded
+                        ? "Funded"
+                        : userData &&
+                          request.borrowerEthAddress.toLowerCase() ===
+                            userData.ethAddress.toLowerCase()
+                        ? "Your Loan"
+                        : "Fund Now"}
+                    </Button>
+                  </CardContent>
+                </GlassCard>
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12}>
+              <Box sx={{ textAlign: "center", py: 4, color: "white"}}>
+                <Typography variant="h6" color="text.secondary">
+                  No loan requests available
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Be the first to create a loan request!
+                </Typography>
+              </Box>
+            </Grid>
           )}
-        </DialogContent>
-        <DialogActions sx={{ padding: 2 }}>
-          <Button
-            onClick={handleClose}
-            sx={{
-              color: "text.secondary",
-              "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
+        </Grid>
+
+        {/* Add Loan Dialog */}
+        <Dialog
+          open={openAddDialog}
+          onClose={handleAddClose}
+          PaperProps={{
+            sx: {
+              borderRadius: 2,
+              padding: 2,
+              maxWidth: "500px",
+              width: "100%",
+              backgroundColor: "rgba(255, 255, 255, 0.1)", // Transparent background
+              backdropFilter: "blur(10px)", // Blurred background
+            },
+          }}
+        >
+          <DialogTitle 
+            sx={{ 
+              fontFamily: "Yatra One", 
+              color: "#00ffff", // Changed to cyan
+              borderBottom: "1px solid rgba(0, 255, 255, 0.2)",
+              textShadow: '0 0 10px rgba(0, 255, 255, 0.3)' // Added glow effect
             }}
           >
-            Cancel
-          </Button>
-          <Button
-            onClick={() => handleFundLoan(selectedLoan)}
-            variant="contained"
-            sx={{
-              backgroundColor: "#007bff",
-              "&:hover": { backgroundColor: "#0056b3" },
+            Create New Loan Request
+          </DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+              <TextField
+                name="amount"
+                label="Loan Amount (ETH)"
+                type="number"
+                value={newLoan.amount}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Allow only valid numbers with up to 18 decimal places
+                  if (value === "" || /^\d*\.?\d{0,18}$/.test(value)) {
+                    setNewLoan((prev) => ({
+                      ...prev,
+                      amount: value,
+                    }));
+                  }
+                }}
+                fullWidth
+                InputProps={{
+                  inputProps: {
+                    step: "0.1",
+                    min: "0",
+                  },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#00ffff", // Cyan border color
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#00ffff", // Cyan border color on hover
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#00ffff", // Cyan border color on focus
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    color: "#fff", // White input text color
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#00ffff", // Cyan label color
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#00ffff", // Cyan label color on focus
+                  },
+                }}
+              />
+              <TextField
+                name="collateral"
+                label="Loan Collateral (ETH)"
+                type="number"
+                value={newLoan.collateral}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Allow only valid numbers with up to 18 decimal places
+                  if (value === "" || /^\d*\.?\d{0,18}$/.test(value)) {
+                    setNewLoan((prev) => ({
+                      ...prev,
+                      collateral: value,
+                    }));
+                  }
+                }}
+                fullWidth
+                InputProps={{
+                  inputProps: {
+                    step: "0.1",
+                    min: "0",
+                  },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#00ffff", // Cyan border color
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#00ffff", // Cyan border color on hover
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#00ffff", // Cyan border color on focus
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    color: "#fff", // White input text color
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#00ffff", // Cyan label color
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#00ffff", // Cyan label color on focus
+                  },
+                }}
+              />
+              <TextField
+                name="duration"
+                label="Loan Duration"
+                select
+                value={newLoan.duration}
+                onChange={handleInputChange}
+                fullWidth
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        backgroundColor: "#333", // Gray background color
+                        color: "#00ffff", // Cyan text color
+                      },
+                    },
+                  },
+                  IconComponent: (props) => (
+                    <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#00ffff", // Cyan border color
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#00ffff", // Cyan border color on hover
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#00ffff", // Cyan border color on focus
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    color: "#fff", // White input text color
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#00ffff", // Cyan label color
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#00ffff", // Cyan label color on focus
+                  },
+                }}
+              >
+                <MenuItem value={1}>1 month</MenuItem>
+                <MenuItem value={2}>2 months</MenuItem>
+                <MenuItem value={3}>3 months</MenuItem>
+                <MenuItem value={4}>4 months</MenuItem>
+                <MenuItem value={5}>5 months</MenuItem>
+                <MenuItem value={6}>6 months</MenuItem>
+                <MenuItem value={7}>7 months</MenuItem>
+                <MenuItem value={8}>8 months</MenuItem>
+                <MenuItem value={9}>9 months</MenuItem>
+                <MenuItem value={10}>10 months</MenuItem>
+                <MenuItem value={11}>11 months</MenuItem>
+                <MenuItem value={12}>12 months</MenuItem>
+              </TextField>
+
+              <TextField
+                name="purpose"
+                label="Loan Purpose"
+                select
+                value={newLoan.purpose}
+                onChange={handleInputChange}
+                fullWidth
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        backgroundColor: "#333", // Gray background color
+                        color: "#00ffff", // Cyan text color
+                      },
+                    },
+                  },
+                  IconComponent: (props) => (
+                    <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#00ffff", // Cyan border color
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#00ffff", // Cyan border color on hover
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#00ffff", // Cyan border color on focus
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    color: "#fff", // White input text color
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#00ffff", // Cyan label color
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#00ffff", // Cyan label color on focus
+                  },
+                }}
+              >
+                <MenuItem value="Business Expansion">Business Expansion</MenuItem>
+                <MenuItem value="Equipment Purchase">Equipment Purchase</MenuItem>
+                <MenuItem value="Working Capital">Working Capital</MenuItem>
+                <MenuItem value="Inventory">Inventory</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </TextField>
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ padding: 2 }}>
+            <Button
+              onClick={handleAddClose}
+              sx={{
+                color: "#00ffff", // Cyan color
+                "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleCreateRequest}
+              sx={{
+                backgroundColor: "#333", // Dark gray background
+                color: "#00ffff", // Cyan color
+                "&:hover": { backgroundColor: "#555" }, // Slightly lighter dark gray on hover
+              }}
+            >
+              Create Request
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Fund Confirmation Dialog */}
+        <Dialog
+          open={openDialog}
+          onClose={handleClose}
+          PaperProps={{
+            sx: {
+              borderRadius: 2,
+              padding: 2,
+              maxWidth: "400px",
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              boxShadow: "0 8px 32px rgba(100, 255, 218, 0.1)",
+            },
+          }}
+        >
+          <DialogTitle 
+            sx={{ 
+              fontFamily: "Yatra One", 
+              color: "#00ffff", // Changed to cyan
+              borderBottom: "1px solid rgba(0, 255, 255, 0.2)",
+              textShadow: '0 0 10px rgba(0, 255, 255, 0.3)' // Added glow effect
             }}
           >
             Confirm Funding
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </DialogTitle>
+          <DialogContent>
+            {selectedLoan && (
+              <Box sx={{ my: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <AccountBalanceIcon sx={{ mr: 1, color: "#64ffda" }} />
+                  <Typography sx={{ color: '#E0FAFF' }}>
+                    Amount: {selectedLoan.loanAmount} ETH
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <TimerIcon sx={{ mr: 1, color: "#64ffda" }} />
+                  <Typography sx={{ color: '#E0FAFF' }}>
+                    Duration: {selectedLoan.duration} months
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Avatar 
+                    sx={{ 
+                      width: 24, 
+                      height: 24, 
+                      mr: 1,
+                      background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
+                    }} 
+                  />
+                  <Typography sx={{ color: '#91C3D0', fontSize: '0.9rem' }}>
+                    {selectedLoan.borrowerEthAddress.slice(0, 20)}...
+                    {selectedLoan.borrowerEthAddress.slice(-4)}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+          </DialogContent>
+          <DialogActions sx={{ padding: 2, borderTop: "1px solid rgba(100, 255, 218, 0.2)" }}>
+            <Button
+              onClick={handleClose}
+              sx={{
+                color: "#91C3D0",
+                borderRadius: "8px",
+                '&:hover': {
+                  backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleFundLoan(selectedLoan)}
+              variant="contained"
+              sx={{
+                backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                backdropFilter: 'blur(5px)',
+                border: '1px solid rgba(100, 255, 218, 0.3)',
+                color: '#64ffda',
+                borderRadius: "8px",
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  backgroundColor: 'rgba(100, 255, 218, 0.2)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
+                }
+              }}
+            >
+              Confirm Funding
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      {/* Snackbar Notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
+        {/* Snackbar Notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
           onClose={handleSnackbarClose}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Alert
+            onClose={handleSnackbarClose}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </Container>
   );
 };
 

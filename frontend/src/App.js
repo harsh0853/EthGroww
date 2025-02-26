@@ -10,6 +10,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer/Footer";
 import Feed from "./components/feed";
 import ActiveLoans from "./components/ActiveLoans";
+import Feedback from './components/Feedback';
+
 function App() {
   return (
     <>
@@ -23,6 +25,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<ProfileDashBoard />} />
+          <Route path="/feedback" element={<Feedback />} />
         </Routes>
       </BrowserRouter>
       <Footer />

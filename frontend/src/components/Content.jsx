@@ -8,11 +8,6 @@ import {
     styled,
     Box,
     Stack,
-    Email,
-  Instagram,
-  Discord,
-  Facebook,
-  LinkedIn
 } from "@mui/material";
 // icons
 import SportsGymnasticsIcon from '@mui/icons-material/MonetizationOnTwoTone';
@@ -32,6 +27,8 @@ import { Carousel } from "react-responsive-carousel";
 // components
 import Title from './Title'
 import Paragraph from './Paragraph'
+import { Link } from 'react-router-dom';
+import { useSmoothScroll } from '../hooks/useSmoothScroll';
 
 const TumblingGridItem = styled(Grid)(({ theme }) => ({
     '&:hover': {
@@ -59,7 +56,21 @@ const tumblingKeyframes = `
     }
 `;
 
+// Add this styled component after your existing styled components
+const PlanContainer = styled(Box)({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: '2rem',
+  marginBottom: '2rem',
+  '@media (max-width: 600px)': {
+    flexDirection: 'column',
+    textAlign: 'center',
+  }
+});
+
 const Content = () => {
+    useSmoothScroll();
     const [currentIndex, setCurrentIndex] = useState();
 
     const imageData = [
@@ -108,7 +119,10 @@ const Content = () => {
     }
 
     return (
-        <>
+        <Box sx={{ 
+            scrollBehavior: 'smooth',
+            overflowY: 'hidden'
+          }}>
             {/* Existing Content section */}
             <Grid container spacing={2}   
                 sx={{
@@ -128,8 +142,10 @@ const Content = () => {
                     
                     <Title
                     text={
-                        'What we are offering?'
-                    }
+                        <>
+                          What we are offering?
+                        </>
+                      }
                     textAlign={'start'}
                     /> 
 
@@ -364,7 +380,7 @@ const Content = () => {
                 justifyContent= 'center'
                 alignItems= 'center'
                 sx={{
-                    py: 8,
+                    py: 2,
                     px: 2,
                     display: { xs: 'flex'},
                 }}
@@ -376,7 +392,11 @@ const Content = () => {
                     }}
                 >
                     <Title 
-                        text={'Future Plans and Aim'}
+                        text={
+                            <>
+                             Future Plans and Aim
+                            </>
+                          }
                         textAlign={'center'}
                     />
                     <Paragraph 
@@ -391,28 +411,116 @@ const Content = () => {
                         textAlign={'center'}
                     />
                 </Box>
-                
-                <Box sx={{ 
-                    maxWidth: 700,
-                    width: '100%',
-                }}>
-                    <Carousel
-                        centerSlidePercentage={10}
-                        thumbWidth={200}
-                        dynamicHeight={false}
-                        centerMode={false}
-                        showArrows={true}
-                        autoPlay={true}
-                        infiniteLoop={true}
-                        selectedItem={imageData[currentIndex]}
-                        onChange={handleChange}
-                        className="carousel-container"
-                    >
-                        {renderSlides}
-                    </Carousel>
-                    
-                </Box>
+            
             </Stack>
+
+            <Stack
+  direction='column'
+  justifyContent='center'
+  alignItems='center'
+  sx={{
+    px: 2,
+    display: { xs: 'flex' },
+    overflowY: 'hidden',
+    scrollBehavior: 'smooth',
+  }}
+>
+  <Box
+    component='section'
+    sx={{
+      paddingBottom: 3,
+      width: '100%',
+      maxWidth: '1200px',
+    }}
+  >
+
+    {[
+      {
+        title: "Cross-Chain Integration",
+        description: "• Expand to multiple blockchain networks\n• Implement cross-chain lending capabilities\n• Reduce transaction costs through Layer 2 solutions",
+        image: "https://images.pexels.com/photos/8369770/pexels-photo-8369770.jpeg"
+      },
+      {
+        title: "Advanced Risk Assessment",
+        description: "• Implement AI-powered credit scoring\n• Develop real-time risk monitoring\n• Introduce dynamic interest rates",
+        image: "https://images.pexels.com/photos/7567236/pexels-photo-7567236.jpeg",
+        reverse: true
+      },
+      {
+        title: "Community Governance",
+        description: "• Launch governance token\n• Enable community voting on protocol changes\n• Implement decentralized dispute resolution",
+        image: "https://images.pexels.com/photos/6771607/pexels-photo-6771607.jpeg"
+      }
+    ].map((plan, index) => (
+      <PlanContainer key={index} sx={{ flexDirection: plan.reverse ? 'row-reverse' : 'row' }}>
+        <Box
+          sx={{
+            flex: 1,
+            p: 3,
+            backgroundColor: 'rgba(26, 32, 47, 0.95)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '16px',
+            border: '1px solid rgba(100, 255, 218, 0.2)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-5px)',
+              boxShadow: '0 8px 32px rgba(100, 255, 218, 0.1)',
+            }
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              color: '#00ffff',
+              fontFamily: 'Yatra One',
+              mb: 2,
+              textAlign: { xs: 'center', md: 'left' }
+            }}
+          >
+            {plan.title}
+          </Typography>
+          {plan.description.split('\n').map((bullet, i) => (
+            <Typography
+              key={i}
+              sx={{
+                color: '#91C3D0',
+                mb: 1,
+                fontFamily: 'Almendra',
+                textAlign: { xs: 'center', md: 'left' }
+              }}
+            >
+              {bullet}
+            </Typography>
+          ))}
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            height: '300px',
+            overflow: 'hidden',
+            borderRadius: '16px',
+            border: '1px solid rgba(100, 255, 218, 0.2)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-5px)',
+              boxShadow: '0 8px 32px rgba(100, 255, 218, 0.1)',
+            }
+          }}
+        >
+          <img
+            src={plan.image}
+            alt={plan.title}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
+          />
+        </Box>
+      </PlanContainer>
+    ))}
+  </Box>
+</Stack>
 
             <Stack
   direction="column"
@@ -431,7 +539,7 @@ const Content = () => {
     }}
   >
     <Title 
-      text={'Join Our Community'}
+      text={'Join our Community'}
       textAlign={'center'}
     />
     <Paragraph 
@@ -481,7 +589,7 @@ const Content = () => {
         title: 'Feedback',
         description: 'Help us improve by sharing your feedback',
         buttonText: 'Give Feedback',
-        link: '/feedback'
+        link: '/feedback' // This link will work with react-router
       }
     ].map((item, index) => (
       <TumblingGridItem item xs={12} sm={6} md={3} key={index}>
@@ -537,10 +645,8 @@ const Content = () => {
               {item.description}
             </Typography>
             <IconButton
-              component="a"
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
+              component={Link} // Change this to Link component
+              to={item.link} // Use 'to' instead of 'href'
               sx={{
                 color: '#4ac3b6',
                 border: '1px solid #4ac3b6',
@@ -562,7 +668,7 @@ const Content = () => {
   </Grid>
 </Stack>
 
-        </>
+        </Box>
     );
 }
 
