@@ -42,44 +42,44 @@ const slideIn = keyframes`
 
 // Update SidebarContainer styling
 const SidebarContainer = styled(Box)(({ theme, isOpen }) => ({
-  position: 'fixed',
-  right: '0px',
+  position: "fixed",
+  right: "0px",
   top: 0, // Change to 0 to touch the top
-  width: '380px',
-  height: '100vh', // Change to full height
-  backgroundColor: 'rgba(26, 32, 47, 0.95)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(100, 255, 218, 0.2)',
-  padding: '2rem',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
+  width: "380px",
+  height: "100vh", // Change to full height
+  backgroundColor: "rgba(26, 32, 47, 0.95)",
+  backdropFilter: "blur(10px)",
+  border: "1px solid rgba(100, 255, 218, 0.2)",
+  padding: "2rem",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
   zIndex: 1400, // Increase z-index to be above navbar
-  transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-  transition: 'transform 0.3s ease-out',
-  overflowY: 'hidden',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-  '@media (max-width: 600px)': {
-    width: '100%',
+  transform: isOpen ? "translateX(0)" : "translateX(100%)",
+  transition: "transform 0.3s ease-out",
+  overflowY: "hidden",
+  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+  "@media (max-width: 600px)": {
+    width: "100%",
     right: 0,
-  }
+  },
 }));
 
 // Add a backdrop for mobile
 const Backdrop = styled(Box)(({ isOpen }) => ({
-  position: 'fixed',
+  position: "fixed",
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  backdropFilter: 'blur(3px)',
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  backdropFilter: "blur(3px)",
   zIndex: 1100,
   opacity: isOpen ? 1 : 0,
-  visibility: isOpen ? 'visible' : 'hidden',
-  transition: 'opacity 0.3s ease-out, visibility 0.3s ease-out',
-  '@media (min-width: 600px)': {
-    display: 'none',
+  visibility: isOpen ? "visible" : "hidden",
+  transition: "opacity 0.3s ease-out, visibility 0.3s ease-out",
+  "@media (min-width: 600px)": {
+    display: "none",
   },
 }));
 
@@ -565,7 +565,10 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
           <InfoLabel>ETH Address</InfoLabel>
           <InfoValue onClick={handleCopyAddress} sx={{ cursor: "pointer" }}>
             {userData?.ethAddress
-              ? `${userData.ethAddress.slice(0, 6)}...${userData.ethAddress.slice(-4)}`
+              ? `${userData.ethAddress.slice(
+                  0,
+                  6
+                )}...${userData.ethAddress.slice(-4)}`
               : "Not Connected"}
           </InfoValue>
         </InfoContainer>
@@ -610,7 +613,9 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
             <Typography variant="h4" sx={{ color: "#00ffff", mb: 1 }}>
               {activeLoans.length}
             </Typography>
-            <Typography sx={{ color: "#91C3D0", fontSize: "0.9rem", textAlign:'center' }}>
+            <Typography
+              sx={{ color: "#91C3D0", fontSize: "0.9rem", textAlign: "center" }}
+            >
               Active Loans
             </Typography>
           </StatBox>

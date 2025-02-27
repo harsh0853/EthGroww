@@ -30,7 +30,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { ethers } from "ethers";
 import contractABI from "./contractABI.json";
-import { useSmoothScroll } from '../hooks/useSmoothScroll';
+import { useSmoothScroll } from "../hooks/useSmoothScroll";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   margin: "10px",
@@ -41,21 +41,21 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
 }));
 const GlassCard = styled(StyledCard)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.05)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  '& .MuiCardContent-root': {
-    color: '#E0FAFF',
+  background: "rgba(255, 255, 255, 0.05)",
+  backdropFilter: "blur(10px)",
+  border: "1px solid rgba(255, 255, 255, 0.1)",
+  "& .MuiCardContent-root": {
+    color: "#E0FAFF",
   },
-  '& .MuiTypography-root': {
-    color: '#E0FAFF',
+  "& .MuiTypography-root": {
+    color: "#E0FAFF",
   },
-  '& .MuiTypography-secondary': {
-    color: '#91C3D0',
-  }
+  "& .MuiTypography-secondary": {
+    color: "#91C3D0",
+  },
 }));
 
-const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const AddLoanButton = styled(Button)(({ theme }) => ({
   borderRadius: "50px",
   padding: "12px 24px",
@@ -69,7 +69,7 @@ const AddLoanButton = styled(Button)(({ theme }) => ({
 
 const Feed = () => {
   useSmoothScroll();
-  
+
   const [loanRequests, setLoanRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedLoan, setSelectedLoan] = useState(null);
@@ -159,7 +159,7 @@ const Feed = () => {
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      // const userAddress = await signer.getAddress();
+      const userAddress = await signer.getAddress();
       const userData = JSON.parse(localStorage.getItem("userData"));
 
       if (!userData || !userData.ethAddress) {
@@ -310,7 +310,7 @@ const Feed = () => {
       });
 
       console.log("Transaction sent:", tx.hash);
-      // const receipt = await tx.wait();
+      const receipt = await tx.wait();
       //console.log("Transaction confirmed:", receipt.transactionHash);
 
       // Update database after successful blockchain transaction
@@ -401,20 +401,20 @@ const Feed = () => {
     );
   }
 
-  const dummyLoanRequest = {
-    loanId: "123",
-    borrowerEthAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    loanAmount: 5.5,
-    creditScore: 750,
-    duration: 6,
-    isFunded: false
-  };
+  // const dummyLoanRequest = {
+  //   loanId: "123",
+  //   borrowerEthAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+  //   loanAmount: 5.5,
+  //   creditScore: 750,
+  //   duration: 6,
+  //   isFunded: false
+  // };
 
   return (
     <Container
       sx={{
-        overflowY: 'hidden',
-        scrollBehavior: 'smooth',
+        overflowY: "hidden",
+        scrollBehavior: "smooth",
         // ...existing styles
       }}
     >
@@ -441,7 +441,7 @@ const Feed = () => {
             sx={{
               fontFamily: "Yatra One",
               color: "#00ffff", // Changed to cyan
-              textShadow: '0 0 10px rgba(0, 255, 255, 0.3)' // Added glow effect
+              textShadow: "0 0 10px rgba(0, 255, 255, 0.3)", // Added glow effect
             }}
           >
             Loan Requests
@@ -465,55 +465,74 @@ const Feed = () => {
         </Box>
 
         {/* Loan Requests Grid */}
-        <Grid container spacing={3} sx={{ maxWidth: "1200px", margin: "0 auto", mb: 4 }}>
-          <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          container
+          spacing={3}
+          sx={{ maxWidth: "1200px", margin: "0 auto", mb: 4 }}
+        >
+          {/* <Grid item xs={12} sm={6} md={4}>
             <GlassCard>
               <CardContent>
-                <Box sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: 2,
-                }}>
-                  <Avatar sx={{ 
-                    marginRight: 2,
-                    background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
-                  }} />
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 2,
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      marginRight: 2,
+                      background:
+                        "linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)",
+                    }}
+                  />
                   <Box>
                     <Typography variant="h6">
                       Loan #{dummyLoanRequest.loanId}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#91C3D0' }}>
+                    <Typography variant="body2" sx={{ color: "#91C3D0" }}>
                       {dummyLoanRequest.borrowerEthAddress.slice(0, 20)}...
                       {dummyLoanRequest.borrowerEthAddress.slice(-4)}
                     </Typography>
                   </Box>
                 </Box>
 
-                <Box sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: 1,
-                }}>
-                  <AccountBalanceIcon sx={{ marginRight: 1, color: "#64ffda" }} />
-                  <Typography sx={{ color: '#E0FAFF' }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 1,
+                  }}
+                >
+                  <AccountBalanceIcon
+                    sx={{ marginRight: 1, color: "#64ffda" }}
+                  />
+                  <Typography sx={{ color: "#E0FAFF" }}>
                     ${dummyLoanRequest.loanAmount.toLocaleString()} ETH
                   </Typography>
                 </Box>
 
-                <Box sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: 1,
-                }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 1,
+                  }}
+                >
                   <CreditScoreIcon sx={{ marginRight: 1, color: "#28a745" }} />
-                  <Typography>Credit Score: {dummyLoanRequest.creditScore}</Typography>
+                  <Typography>
+                    Credit Score: {dummyLoanRequest.creditScore}
+                  </Typography>
                 </Box>
 
-                <Box sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: 2,
-                }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 2,
+                  }}
+                >
                   <TimerIcon sx={{ marginRight: 1, color: "#dc3545" }} />
                   <Typography>{dummyLoanRequest.duration} months</Typography>
                 </Box>
@@ -523,15 +542,15 @@ const Feed = () => {
                   fullWidth
                   onClick={() => handleFundClick(dummyLoanRequest)}
                   sx={{
-                    backgroundColor: 'rgba(100, 255, 218, 0.1)',
-                    backdropFilter: 'blur(5px)',
-                    border: '1px solid rgba(100, 255, 218, 0.3)',
-                    color: '#64ffda',
-                    transition: 'all 0.3s ease-in-out',
-                    '&:hover': {
-                      backgroundColor: 'rgba(100, 255, 218, 0.2)',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
+                    backgroundColor: "rgba(100, 255, 218, 0.1)",
+                    backdropFilter: "blur(5px)",
+                    border: "1px solid rgba(100, 255, 218, 0.3)",
+                    color: "#64ffda",
+                    transition: "all 0.3s ease-in-out",
+                    "&:hover": {
+                      backgroundColor: "rgba(100, 255, 218, 0.2)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 0 20px rgba(100, 255, 218, 0.2)",
                     },
                   }}
                 >
@@ -539,7 +558,7 @@ const Feed = () => {
                 </Button>
               </CardContent>
             </GlassCard>
-          </Grid>
+          </Grid> */}
           {loanRequests.length > 0 ? (
             loanRequests.map((request) => (
               <Grid item xs={12} sm={6} md={4} key={request.loanId}>
@@ -552,15 +571,21 @@ const Feed = () => {
                         marginBottom: 2,
                       }}
                     >
-                      <Avatar sx={{ 
-                        marginRight: 2,
-                        background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
-                      }} />
+                      <Avatar
+                        sx={{
+                          marginRight: 2,
+                          background:
+                            "linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)",
+                        }}
+                      />
                       <Box>
-                        <Typography variant="h6" sx={{fontFamily:'Yatra One'}}>
-                          Loan #{request.loanId}
+                        <Typography
+                          variant="h6"
+                          sx={{ fontFamily: "Yatra One" }}
+                        >
+                          Loan {request.loanId}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#91C3D0' }}>
+                        <Typography variant="body2" sx={{ color: "#91C3D0" }}>
                           {request.borrowerEthAddress.slice(0, 20)}...
                           {request.borrowerEthAddress.slice(-4)}
                         </Typography>
@@ -574,8 +599,10 @@ const Feed = () => {
                         marginBottom: 1,
                       }}
                     >
-                      <AccountBalanceIcon sx={{ marginRight: 1, color: "#64ffda" }} />
-                      <Typography sx={{ color: '#E0FAFF' }}>
+                      <AccountBalanceIcon
+                        sx={{ marginRight: 1, color: "#64ffda" }}
+                      />
+                      <Typography sx={{ color: "#E0FAFF" }}>
                         ${request.loanAmount.toLocaleString()}
                       </Typography>
                     </Box>
@@ -590,7 +617,9 @@ const Feed = () => {
                       <CreditScoreIcon
                         sx={{ marginRight: 1, color: "#28a745" }}
                       />
-                      <Typography>Credit Score: {request.creditScore}</Typography>
+                      <Typography>
+                        Credit Score: {request.creditScore}
+                      </Typography>
                     </Box>
 
                     <Box
@@ -615,7 +644,9 @@ const Feed = () => {
                             userData.ethAddress.toLowerCase())
                       }
                       sx={{
-                        backgroundColor: request.isFunded ? "#6c757d" : "#007bff",
+                        backgroundColor: request.isFunded
+                          ? "#6c757d"
+                          : "#007bff",
                         "&:hover": {
                           backgroundColor: request.isFunded
                             ? "#6c757d"
@@ -637,7 +668,7 @@ const Feed = () => {
             ))
           ) : (
             <Grid item xs={12}>
-              <Box sx={{ textAlign: "center", py: 4, color: "white"}}>
+              <Box sx={{ textAlign: "center", py: 4, color: "white" }}>
                 <Typography variant="h6" color="text.secondary">
                   No loan requests available
                 </Typography>
@@ -664,18 +695,20 @@ const Feed = () => {
             },
           }}
         >
-          <DialogTitle 
-            sx={{ 
-              fontFamily: "Yatra One", 
+          <DialogTitle
+            sx={{
+              fontFamily: "Yatra One",
               color: "#00ffff", // Changed to cyan
               borderBottom: "1px solid rgba(0, 255, 255, 0.2)",
-              textShadow: '0 0 10px rgba(0, 255, 255, 0.3)' // Added glow effect
+              textShadow: "0 0 10px rgba(0, 255, 255, 0.3)", // Added glow effect
             }}
           >
             Create New Loan Request
           </DialogTitle>
           <DialogContent>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
+            >
               <TextField
                 name="amount"
                 label="Loan Amount (ETH)"
@@ -783,7 +816,10 @@ const Feed = () => {
                     },
                   },
                   IconComponent: (props) => (
-                    <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
+                    <ArrowDropDownIcon
+                      {...props}
+                      style={{ color: "#00ffff" }}
+                    /> // Cyan dropdown arrow color
                   ),
                 }}
                 sx={{
@@ -840,7 +876,10 @@ const Feed = () => {
                     },
                   },
                   IconComponent: (props) => (
-                    <ArrowDropDownIcon {...props} style={{ color: "#00ffff" }} /> // Cyan dropdown arrow color
+                    <ArrowDropDownIcon
+                      {...props}
+                      style={{ color: "#00ffff" }}
+                    /> // Cyan dropdown arrow color
                   ),
                 }}
                 sx={{
@@ -866,8 +905,12 @@ const Feed = () => {
                   },
                 }}
               >
-                <MenuItem value="Business Expansion">Business Expansion</MenuItem>
-                <MenuItem value="Equipment Purchase">Equipment Purchase</MenuItem>
+                <MenuItem value="Business Expansion">
+                  Business Expansion
+                </MenuItem>
+                <MenuItem value="Equipment Purchase">
+                  Equipment Purchase
+                </MenuItem>
                 <MenuItem value="Working Capital">Working Capital</MenuItem>
                 <MenuItem value="Inventory">Inventory</MenuItem>
                 <MenuItem value="Other">Other</MenuItem>
@@ -914,12 +957,12 @@ const Feed = () => {
             },
           }}
         >
-          <DialogTitle 
-            sx={{ 
-              fontFamily: "Yatra One", 
+          <DialogTitle
+            sx={{
+              fontFamily: "Yatra One",
               color: "#00ffff", // Changed to cyan
               borderBottom: "1px solid rgba(0, 255, 255, 0.2)",
-              textShadow: '0 0 10px rgba(0, 255, 255, 0.3)' // Added glow effect
+              textShadow: "0 0 10px rgba(0, 255, 255, 0.3)", // Added glow effect
             }}
           >
             Confirm Funding
@@ -927,28 +970,29 @@ const Feed = () => {
           <DialogContent>
             {selectedLoan && (
               <Box sx={{ my: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <AccountBalanceIcon sx={{ mr: 1, color: "#64ffda" }} />
-                  <Typography sx={{ color: '#E0FAFF' }}>
+                  <Typography sx={{ color: "#E0FAFF" }}>
                     Amount: {selectedLoan.loanAmount} ETH
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <TimerIcon sx={{ mr: 1, color: "#64ffda" }} />
-                  <Typography sx={{ color: '#E0FAFF' }}>
+                  <Typography sx={{ color: "#E0FAFF" }}>
                     Duration: {selectedLoan.duration} months
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Avatar 
-                    sx={{ 
-                      width: 24, 
-                      height: 24, 
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Avatar
+                    sx={{
+                      width: 24,
+                      height: 24,
                       mr: 1,
-                      background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
-                    }} 
+                      background:
+                        "linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)",
+                    }}
                   />
-                  <Typography sx={{ color: '#91C3D0', fontSize: '0.9rem' }}>
+                  <Typography sx={{ color: "#91C3D0", fontSize: "0.9rem" }}>
                     {selectedLoan.borrowerEthAddress.slice(0, 20)}...
                     {selectedLoan.borrowerEthAddress.slice(-4)}
                   </Typography>
@@ -956,15 +1000,17 @@ const Feed = () => {
               </Box>
             )}
           </DialogContent>
-          <DialogActions sx={{ padding: 2, borderTop: "1px solid rgba(100, 255, 218, 0.2)" }}>
+          <DialogActions
+            sx={{ padding: 2, borderTop: "1px solid rgba(100, 255, 218, 0.2)" }}
+          >
             <Button
               onClick={handleClose}
               sx={{
                 color: "#91C3D0",
                 borderRadius: "8px",
-                '&:hover': {
-                  backgroundColor: 'rgba(100, 255, 218, 0.1)',
-                }
+                "&:hover": {
+                  backgroundColor: "rgba(100, 255, 218, 0.1)",
+                },
               }}
             >
               Cancel
@@ -973,17 +1019,17 @@ const Feed = () => {
               onClick={() => handleFundLoan(selectedLoan)}
               variant="contained"
               sx={{
-                backgroundColor: 'rgba(100, 255, 218, 0.1)',
-                backdropFilter: 'blur(5px)',
-                border: '1px solid rgba(100, 255, 218, 0.3)',
-                color: '#64ffda',
+                backgroundColor: "rgba(100, 255, 218, 0.1)",
+                backdropFilter: "blur(5px)",
+                border: "1px solid rgba(100, 255, 218, 0.3)",
+                color: "#64ffda",
                 borderRadius: "8px",
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  backgroundColor: 'rgba(100, 255, 218, 0.2)',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
-                }
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "rgba(100, 255, 218, 0.2)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 0 20px rgba(100, 255, 218, 0.2)",
+                },
               }}
             >
               Confirm Funding

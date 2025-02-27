@@ -18,17 +18,17 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import contractABI from "./contractABI.json";
-import { useSmoothScroll } from '../hooks/useSmoothScroll';
-import { scrollToElement } from '../utils/smoothScroll';
-const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+import { useSmoothScroll } from "../hooks/useSmoothScroll";
+import { scrollToElement } from "../utils/smoothScroll";
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 const ActiveLoansContainer = styled(Box)({
   display: "flex",
   flexWrap: "wrap",
   gap: "24px",
   padding: "24px",
-  backgroundColor: 'transparent',
-  backdropFilter: 'blur(10px)',
+  backgroundColor: "transparent",
+  backdropFilter: "blur(10px)",
   minHeight: "calc(100vh - 80px)",
 });
 
@@ -48,20 +48,20 @@ const LoanCard = styled(Grid)({
 
 const StyledCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(2),
-  background: 'rgba(255, 255, 255, 0.05)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
+  background: "rgba(255, 255, 255, 0.05)",
+  backdropFilter: "blur(10px)",
+  border: "1px solid rgba(255, 255, 255, 0.1)",
   transition: "all 0.3s ease",
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: '0 8px 32px rgba(100, 255, 218, 0.2)',
+  "&:hover": {
+    transform: "translateY(-4px)",
+    boxShadow: "0 8px 32px rgba(100, 255, 218, 0.2)",
   },
-  '& .MuiTypography-root': {
-    color: '#E0FAFF',
+  "& .MuiTypography-root": {
+    color: "#E0FAFF",
   },
-  '& .MuiTypography-secondary': {
-    color: '#91C3D0',
-  }
+  "& .MuiTypography-secondary": {
+    color: "#91C3D0",
+  },
 }));
 
 const LoanInfoItem = styled(Box)({
@@ -317,22 +317,27 @@ const ActiveLoans = () => {
   return (
     <Box
       sx={{
-        overflowY: 'hidden',
-        scrollBehavior: 'smooth',
+        overflowY: "hidden",
+        scrollBehavior: "smooth",
       }}
     >
       <ActiveLoansContainer>
         <Box sx={{ width: "100%", mb: 4 }}>
-          <Typography variant="h4" gutterBottom sx={{ 
-            fontFamily: "Yatra One",
-            color: '#E0FAFF',
-            '& span': {
-              background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }
-          }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              fontFamily: "Yatra One",
+              color: "#E0FAFF",
+              "& span": {
+                background:
+                  "linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              },
+            }}
+          >
             Active Loans (<span>{activeLoans.length}</span>)
           </Typography>
         </Box>
@@ -429,7 +434,7 @@ const ActiveLoans = () => {
           </LoanCard>
         ))}
       </ActiveLoansContainer>
-      <Button onClick={() => handleNavClick('targetSection')}>
+      <Button onClick={() => handleNavClick("targetSection")}>
         Scroll to Section
       </Button>
     </Box>
