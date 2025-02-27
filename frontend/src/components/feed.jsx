@@ -190,7 +190,8 @@ const Feed = () => {
 
       const amountInWei = ethers.parseEther(newLoan.amount.toString());
       const collateralInWei = ethers.parseEther(newLoan.collateral.toString());
-
+      console.log(amountInWei.toString());
+      console.log(collateralInWei.toString());
       console.log("Sending loan request to blockchain and database", {
         amountInWei: amountInWei.toString(),
         durationInSeconds,

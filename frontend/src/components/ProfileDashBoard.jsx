@@ -345,6 +345,30 @@ const ProfileDashBoard = ({ isOpen, onClose }) => {
           name: tokenPayload.username.toUpperCase() || "Anonymous User",
         };
 
+        try {
+          setLoading(true);
+          const response = await fetch(`${API_URL}/users/current-user`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch user data");
+          }
+
+          const data = await response.json();
+          setUserData(data);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          setSnackbar({
+            open: true,
+            message: error.message,
+            severity: "error",
+          });
+        } finally {
+          setLoading(false);
+        }
         // Get user's location
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(

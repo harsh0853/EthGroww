@@ -45,30 +45,30 @@ const floatAnimation = `
 
 // Styled Components
 const AnimatedImage = styled("img")(({ theme }) => ({
-  width: '80%',
-  borderRadius: '10px',
-  animation: 'float 3s ease-in-out infinite',
-  transition: 'all 0.3s ease-in-out',
-  transformStyle: 'preserve-3d',
-  '&:hover': {
-    transform: 'scale(1.05)',
-    filter: 'drop-shadow(0 20px 30px rgba(100, 255, 218, 0.5))',
+  width: "80%",
+  borderRadius: "10px",
+  animation: "float 3s ease-in-out infinite",
+  transition: "all 0.3s ease-in-out",
+  transformStyle: "preserve-3d",
+  "&:hover": {
+    transform: "scale(1.05)",
+    filter: "drop-shadow(0 20px 30px rgba(100, 255, 218, 0.5))",
   },
-  [theme.breakpoints.down('md')]: {
-    width: '90%',
-    marginTop: '2rem',
-  }
+  [theme.breakpoints.down("md")]: {
+    width: "90%",
+    marginTop: "2rem",
+  },
 }));
 
 // Add this gradient text styling component
-const GradientText = styled('span')({
-  background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  display: 'inline-block',
-  textShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
-  fontFamily: 'Yatra One'
+const GradientText = styled("span")({
+  background: "linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  backgroundClip: "text",
+  display: "inline-block",
+  textShadow: "0 0 20px rgba(100, 255, 218, 0.2)",
+  fontFamily: "Yatra One",
 });
 
 // Update color constants
@@ -258,16 +258,23 @@ const FeatureBox = styled(Box)(({ theme }) => ({
   color: "#FFFFFF",
   [theme.breakpoints.down("md")]: {
     bottom: 10, // Adjust for mobile
-  }
+  },
 }));
 
 const Header = () => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const checkLoginStatus = () => {
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+  };
 
   useEffect(() => {
     fetchNews();
+    checkLoginStatus();
   }, []);
 
   const fetchNews = async () => {
@@ -328,7 +335,8 @@ const Header = () => {
               fontStyle: "normal",
             }}
           >
-            <GradientText>Crypto-Powered</GradientText> Loans for a Better Tomorrow.
+            <GradientText>Crypto-Powered</GradientText> Loans for a Better
+            Tomorrow.
           </Typography>
 
           <Typography
@@ -350,99 +358,127 @@ const Header = () => {
             middlemen, borrowers can access funds instantly with minimal fees.
           </Typography>
 
-          <Box>
-            <StyledButton
-              component={Link}
-              to={"/login"}
-              variant="contained"
-              sx={{
-                mr: 2,
-                px: 4,
-                py: 1,
-                fontSize: "0.9rem",
-                textTransform: "capitalize",
-                borderRadius: 0,
-                borderColor: "#14192d",
-                color: "#fff",
-                backgroundColor: "#14192d",
-                "&&:hover": {
-                  backgroundColor: "#343a55",
-                },
-                "&&:focus": {
-                  backgroundColor: "#343a55",
-                },
-              }}
-            >
-              Log In
-            </StyledButton>
-            <StyledButton
-              component={Link}
-              to={"/about"}
-              variant="outlined"
-              sx={{
-                px: 4,
-                py: 1,
-                fontSize: "0.9rem",
-                textTransform: "capitalize",
-                borderRadius: 0,
-                color: "#fff",
-                backgroundColor: "transparent",
-                borderColor: "#fff",
-                "&&:hover": {
-                  color: "#eee",
-                  borderColor: "#343a55",
-                },
-                "&&:focus": {
-                  color: "#343a55",
-                  borderColor: "#343a55",
-                },
-              }}
-            >
-              Explore
-            </StyledButton>
-          </Box>
+          {isLoggedIn ? (
+            <Box>
+              <StyledButton
+                component={Link}
+                to={"/about"}
+                variant="outlined"
+                sx={{
+                  px: 4,
+                  py: 1,
+                  fontSize: "0.9rem",
+                  textTransform: "capitalize",
+                  borderRadius: 0,
+                  color: "#fff",
+                  backgroundColor: "transparent",
+                  borderColor: "#fff",
+                  "&&:hover": {
+                    color: "#eee",
+                    borderColor: "#343a55",
+                  },
+                  "&&:focus": {
+                    color: "#343a55",
+                    borderColor: "#343a55",
+                  },
+                }}
+              >
+                Explore
+              </StyledButton>
+            </Box>
+          ) : (
+            <Box>
+              <StyledButton
+                component={Link}
+                to={"/login"}
+                variant="contained"
+                sx={{
+                  mr: 2,
+                  px: 4,
+                  py: 1,
+                  fontSize: "0.9rem",
+                  textTransform: "capitalize",
+                  borderRadius: 0,
+                  borderColor: "#14192d",
+                  color: "#fff",
+                  backgroundColor: "#14192d",
+                  "&&:hover": {
+                    backgroundColor: "#343a55",
+                  },
+                  "&&:focus": {
+                    backgroundColor: "#343a55",
+                  },
+                }}
+              >
+                Log In
+              </StyledButton>
+              <StyledButton
+                component={Link}
+                to={"/about"}
+                variant="outlined"
+                sx={{
+                  px: 4,
+                  py: 1,
+                  fontSize: "0.9rem",
+                  textTransform: "capitalize",
+                  borderRadius: 0,
+                  color: "#fff",
+                  backgroundColor: "transparent",
+                  borderColor: "#fff",
+                  "&&:hover": {
+                    color: "#eee",
+                    borderColor: "#343a55",
+                  },
+                  "&&:focus": {
+                    color: "#343a55",
+                    borderColor: "#343a55",
+                  },
+                }}
+              >
+                Explore
+              </StyledButton>
+            </Box>
+          )}
         </BoxText>
 
         <Box
-  sx={(theme) => ({
-    [theme.breakpoints.down("md")]: {
-      flex: "1",
-      paddingTop: "20px",
-      alignSelf: "center",
-      height: "40vh", // Add height constraint for mobile
-    },
-    [theme.breakpoints.up("md")]: {
-      flex: "1",
-      paddingLeft: "100px",
-      alignSelf: "flex-center",
-      height: "50vh", // Add height constraint for desktop
-    },
-    position: 'relative',
-    zIndex: 2,
-    display: 'flex',
-    alignItems: 'center', // Center the image vertically
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      width: '80%',
-      height: '90px',
-      bottom: '-20px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      borderRadius: '50%',
-      zIndex: 1,
-    }
-  })}
->
-  <style>
-    {floatAnimation}
-  </style>
-  <AnimatedImage 
-    src={headerImg} 
-    alt="Ethereum Animation"
-    loading="eager"
-  />
-</Box>
+          sx={(theme) => ({
+            [theme.breakpoints.down("md")]: {
+              flex: "1",
+              paddingTop: "20px",
+              alignSelf: "center",
+              height: "40vh", // Add height constraint for mobile
+            },
+            [theme.breakpoints.up("md")]: {
+              flex: "1",
+              paddingLeft: "100px",
+              alignSelf: "flex-center",
+              height: "50vh", // Add height constraint for desktop
+            },
+            position: "relative",
+            zIndex: 2,
+            display: "flex",
+            alignItems: "center", // Center the image vertically
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              width: "80%",
+              height: "90px",
+              bottom: "-20px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              borderRadius: "50%",
+              zIndex: 1,
+            },
+          })}
+        >
+          <style>{floatAnimation}</style>
+          <AnimatedImage
+            src={headerImg}
+            alt="Ethereum Animation"
+            loading="eager"
+          />
+        </Box>
 
         <FeatureBox>
           <Box
@@ -591,7 +627,8 @@ const Header = () => {
             <Title
               text={
                 <>
-                  <GradientText>Easily access affordable loans</GradientText> for micro-investments
+                  <GradientText>Easily access affordable loans</GradientText>{" "}
+                  for micro-investments
                 </>
               }
               textAlign={"start"}
@@ -610,7 +647,7 @@ const Header = () => {
           </Box>
         </CustomGridItem>
 
-      <Grid item xs={12} sm={4} md={6}>
+        <Grid item xs={12} sm={4} md={6}>
           <Box
             sx={{
               height: "100%",
@@ -637,7 +674,7 @@ const Header = () => {
               }}
             />
           </Box>
-      </Grid>
+        </Grid>
       </Grid>
       <Grid container spacing={4} sx={{ mt: 4, bgcolor: "transparent" }}>
         <Grid
