@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Button, Stack, TextField, styled } from "@mui/material";
+import { Link } from "react-router-dom";
 import Title from "./Title";
 import Paragraph from "./Paragraph";
 
@@ -139,6 +140,8 @@ const Details = () => {
             fullWidth
             type="submit"
             size="medium"
+            to='/feed'
+            component={Link}
             sx={{
               fontSize: '0.9rem',
               textTransform: 'capitalize',

@@ -168,6 +168,12 @@ const NewsItem = styled("div")({
   background: "rgba(255, 255, 255, 0.1)",
   backdropFilter: "blur(10px)",
   boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    backgroundColor: "rgba(100, 255, 218, 0.1)",
+    boxShadow: "0 0 20px rgba(100, 255, 218, 0.3)",
+    transform: "translateY(-2px)",
+  },
   "& h3": {
     marginTop: 2,
     color: "#fff",
@@ -220,13 +226,19 @@ const NewsAlert = styled(Alert)({
   },
 });
 
-// Update buttons
+// Update StyledButton component with consistent hover effect
 const StyledButton = styled(Button)({
-  color: colors.text.primary,
-  borderRadius: "2rem",
+  fontSize: "0.9rem",
+  textTransform: "capitalize",
+  padding: "8px 32px",
+  borderRadius: 0,
+  transition: "all 0.3s ease-in-out",
+  backgroundColor: "#14192d",
+  color: "#fff",
   "&:hover": {
-    backgroundColor: colors.background.lighter,
-    color: colors.primary,
+    backgroundColor: "rgba(100, 255, 218, 0.1)",
+    boxShadow: "0 0 20px rgba(100, 255, 218, 0.3)",
+    transform: "translateY(-2px)",
   },
 });
 
@@ -240,10 +252,13 @@ const FeatureBox = styled(Box)(({ theme }) => ({
   borderRadius: "16px",
   transition: "all 0.3s ease-in-out",
   position: "absolute",
-  bottom: 10,
+  bottom: 20, // Increase bottom spacing
   left: 0,
   right: 0,
   color: "#FFFFFF",
+  [theme.breakpoints.down("md")]: {
+    bottom: 10, // Adjust for mobile
+  }
 }));
 
 const Header = () => {
@@ -302,7 +317,7 @@ const Header = () => {
 
       {/* Hero Section */}
       <CustomBox component="header">
-        <BoxText component="section" sx={{ height: "60vh" }}>
+        <BoxText component="section" sx={{ height: "50vh" }}>
           <Typography
             variant="h2"
             component="h1"
@@ -358,7 +373,7 @@ const Header = () => {
                 },
               }}
             >
-              Sign Up
+              Log In
             </StyledButton>
             <StyledButton
               component={Link}
@@ -374,7 +389,7 @@ const Header = () => {
                 backgroundColor: "transparent",
                 borderColor: "#fff",
                 "&&:hover": {
-                  color: "#343a55",
+                  color: "#eee",
                   borderColor: "#343a55",
                 },
                 "&&:focus": {
@@ -383,7 +398,7 @@ const Header = () => {
                 },
               }}
             >
-              explore
+              Explore
             </StyledButton>
           </Box>
         </BoxText>
@@ -394,23 +409,26 @@ const Header = () => {
       flex: "1",
       paddingTop: "20px",
       alignSelf: "center",
+      height: "40vh", // Add height constraint for mobile
     },
     [theme.breakpoints.up("md")]: {
       flex: "1",
       paddingLeft: "100px",
       alignSelf: "flex-center",
+      height: "50vh", // Add height constraint for desktop
     },
     position: 'relative',
     zIndex: 2,
+    display: 'flex',
+    alignItems: 'center', // Center the image vertically
     '&::after': {
       content: '""',
       position: 'absolute',
       width: '80%',
-      height: '20px',
+      height: '90px',
       bottom: '-20px',
       left: '50%',
       transform: 'translateX(-50%)',
-      background: 'radial-gradient(ellipse at center, rgba(100, 255, 218, 0.2) 0%, transparent 70%)',
       borderRadius: '50%',
       zIndex: 1,
     }
@@ -451,7 +469,7 @@ const Header = () => {
             {[
               {
                 title: "Total Value Locked",
-                value: "$133.96M",
+                value: "$13.3M",
                 icon: (
                   <AccountBalance
                     sx={{
@@ -464,7 +482,7 @@ const Header = () => {
               },
               {
                 title: "Active Loans",
-                value: "40.33K",
+                value: "10.3K",
                 icon: (
                   <MonetizationOn
                     sx={{
@@ -515,9 +533,9 @@ const Header = () => {
                   alignItems: "center",
                   transition: "all 0.3s ease-in-out",
                   "&:hover": {
-                    transform: "translateY(-5px)",
-                    boxShadow: "inset -2px 0 20px rgba(100, 255, 218, 0.2)",
-                    background: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: "rgba(100, 255, 218, 0.1)",
+                    boxShadow: "0 0 20px rgba(100, 255, 218, 0.3)",
+                    transform: "translateY(-2px)",
                   },
                 }}
               >
@@ -592,16 +610,19 @@ const Header = () => {
           </Box>
         </CustomGridItem>
 
-        <Grid item xs={12} sm={4} md={6}>
+      <Grid item xs={12} sm={4} md={6}>
           <Box
             sx={{
               height: "100%",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              transition: "transform 0.3s ease-in-out",
+              transition: "all 0.3s ease-in-out",
               "&:hover": {
-                transform: "translateY(-10px)",
+                transform: "translateY(-2px)",
+                "& img": {
+                  filter: "drop-shadow(0 0 20px #00ffff)",
+                },
               },
             }}
           >
@@ -612,18 +633,11 @@ const Header = () => {
                 width: "50%",
                 height: "100%",
                 objectFit: "cover",
-                filter: "drop-shadow(0 0 10px #00ffff)",
-                transition: "filter 0.3s ease-in-out",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.filter = "drop-shadow(0 0 20px #00ffff)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.filter = "drop-shadow(0 0 10px #00ffff)";
+                transition: "all 0.3s ease-in-out",
               }}
             />
           </Box>
-        </Grid>
+      </Grid>
       </Grid>
       <Grid container spacing={4} sx={{ mt: 4, bgcolor: "transparent" }}>
         <Grid
@@ -641,9 +655,12 @@ const Header = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              transition: "transform 0.3s ease-in-out",
+              transition: "all 0.3s ease-in-out",
               "&:hover": {
-                transform: "translateY(-10px)",
+                transform: "translateY(-2px)",
+                "& img": {
+                  filter: "drop-shadow(0 0 20px #00ffff)",
+                },
               },
             }}
           >
@@ -654,14 +671,7 @@ const Header = () => {
                 width: "50%",
                 height: "100%",
                 objectFit: "cover",
-                filter: "drop-shadow(0 0 10px #00ffff)",
-                transition: "filter 0.3s ease-in-out",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.filter = "drop-shadow(0 0 20px #00ffff)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.filter = "drop-shadow(0 0 10px #00ffff)";
+                transition: "all 0.3s ease-in-out",
               }}
             />
           </Box>
@@ -741,9 +751,12 @@ const Header = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              transition: "transform 0.3s ease-in-out",
+              transition: "all 0.3s ease-in-out",
               "&:hover": {
-                transform: "translateY(-10px)",
+                transform: "translateY(-2px)",
+                "& img": {
+                  filter: "drop-shadow(0 0 20px #00ffff)",
+                },
               },
             }}
           >
@@ -754,14 +767,7 @@ const Header = () => {
                 width: "30%",
                 height: "100%",
                 objectFit: "cover",
-                filter: "drop-shadow(0 0 10px #00ffff)",
-                transition: "filter 0.3s ease-in-out",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.filter = "drop-shadow(0 0 20px #00ffff)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.filter = "drop-shadow(0 0 10px #00ffff)";
+                transition: "all 0.3s ease-in-out",
               }}
             />
           </Box>

@@ -10,6 +10,8 @@ import {
   Chip,
   Button,
   Divider,
+  Avatar,
+  Container,
 } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import { styled } from "@mui/material/styles";
@@ -55,6 +57,26 @@ const StyledCard = styled(Card)(({ theme }) => ({
   '&:hover': {
     transform: 'translateY(-4px)',
     boxShadow: '0 8px 32px rgba(100, 255, 218, 0.2)',
+  },
+  '& .MuiTypography-root': {
+    color: '#E0FAFF',
+  },
+  '& .MuiTypography-secondary': {
+    color: '#91C3D0',
+  }
+}));
+
+const GlassCard = styled(Card)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.05)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  transition: "all 0.3s ease",
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: '0 8px 32px rgba(100, 255, 218, 0.2)',
+  },
+  '& .MuiCardContent-root': {
+    color: '#E0FAFF',
   },
   '& .MuiTypography-root': {
     color: '#E0FAFF',
@@ -220,194 +242,246 @@ const ActiveLoans = () => {
     );
   }
 
-  // const DummyLoansCard = () => {
-  //   return (
-  //     <ActiveLoansContainer>
-  //       <Box sx={{ width: '100%' }}>
-  //       <Typography variant="h4" gutterBottom sx={{fontFamily: "Yatra One", }}>
-  //           Active Loans (3)
-  //         </Typography>
-  //       </Box>
-  //       {[1, 2, 3].map((item) => (
-  //         <LoanCard key={item}>
-  //           <StyledCard sx={{ height: '100%' }}>
-  //             <CardContent>
-  //               <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-  //                 <Typography variant="h5" component="div">
-  //                   Loan #{item}23
-  //                 </Typography>
-  //                 <StatusChip
-  //                   label="ACTIVE"
-  //                   status="active"
-  //                   size="small"
-  //                 />
-  //               </Box>
-
-  //               <Divider sx={{ my: 2 }} />
-
-  //               <Box sx={{ mb: 3 }}>
-  //                 <LoanInfoItem>
-  //                   <AccountBalanceIcon color="primary" />
-  //                   <Typography variant="body1">
-  //                     <strong>Amount Due:</strong> 0.5 ETH
-  //                   </Typography>
-  //                 </LoanInfoItem>
-
-  //                 <LoanInfoItem>
-  //                   <CalendarTodayIcon color="primary" />
-  //                   <Typography variant="body1">
-  //                     <strong>Duration:</strong> 3 months
-  //                   </Typography>
-  //                 </LoanInfoItem>
-
-  //                 <LoanInfoItem>
-  //                   <AccessTimeIcon color="primary" />
-  //                   <Typography variant="body1">
-  //                     <strong>Created:</strong> {new Date().toLocaleDateString()}
-  //                   </Typography>
-  //                 </LoanInfoItem>
-  //               </Box>
-
-  //               <Box sx={{
-  //                 display: "flex",
-  //                 justifyContent: "space-between",
-  //                 alignItems: "center",
-  //                 mt: 2
-  //               }}>
-  //                 <Typography variant="body2" color="text.secondary">
-  //                   You are the borrower
-  //                 </Typography>
-  //                 <Button
-  //                   variant="contained"
-  //                   color="primary"
-  //                   sx={{
-  //                     borderRadius: "20px",
-  //                     textTransform: "none",
-  //                     px: 3,
-  //                   }}
-  //                 >
-  //                   Repay Loan
-  //                 </Button>
-  //               </Box>
-  //             </CardContent>
-  //           </StyledCard>
-  //         </LoanCard>
-  //       ))}
-  //     </ActiveLoansContainer>
-  //   );
-  // };
-
   if (!activeLoans.length) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="calc(100vh - 80px)"
-      >
-        <Typography variant="h6" color="textSecondary">
-          No active loans found
-        </Typography>
-      </Box>
-    );
+      <Container>
+        <Box
+          sx={{
+            padding: 3,
+            backgroundColor: "transparent",
+            backdropFilter: "blur(10px)",
+            minHeight: "calc(100vh - 80px)",
+            position: "relative",
+            zIndex: 1,
+            overflowY: 'hidden',
+            scrollBehavior: 'smooth',
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: 11,
+              marginBottom: 4
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                fontFamily: "Yatra One",
+                color: "#00ffff",
+                textShadow: '0 0 10px rgba(0, 255, 255, 0.3)',
+                '& span': {
+                  background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }
+              }}
+            >
+              Active Loans (<span>{activeLoans.length}</span>)
+            </Typography>
+          </Box>
 
-    // return <DummyLoansCard />;
+          <Grid container spacing={3} sx={{ maxWidth: "1200px", margin: "0 auto" }}>
+            {activeLoans.map((loan) => (
+              <Grid item xs={12} sm={6} md={4} key={loan.loanId}>
+                <GlassCard>
+                  <CardContent>
+                    <Box sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 2,
+                    }}>
+                      <Avatar sx={{ 
+                        marginRight: 2,
+                        background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
+                      }} />
+                      <Box>
+                        <Typography variant="h6" sx={{fontFamily:'Yatra One'}}>
+                          Loan #{loan.loanId}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#91C3D0' }}>
+                          {loan.borrowerEthAddress.slice(0, 20)}...
+                          {loan.borrowerEthAddress.slice(-4)}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 1,
+                    }}>
+                      <AccountBalanceIcon sx={{ marginRight: 1, color: "#64ffda" }} />
+                      <Typography sx={{ color: '#E0FAFF' }}>
+                        {loan.loanPayableAmount} ETH
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 1,
+                    }}>
+                      <CalendarTodayIcon sx={{ marginRight: 1, color: "#64ffda" }} />
+                      <Typography>{loan.duration} months</Typography>
+                    </Box>
+
+                    <Box sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 2,
+                    }}>
+                      <AccessTimeIcon sx={{ marginRight: 1, color: "#64ffda" }} />
+                      <Typography>
+                        Created: {new Date(loan.createdAt).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      onClick={() => {}}
+                      sx={{
+                        backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                        backdropFilter: 'blur(5px)',
+                        border: '1px solid rgba(100, 255, 218, 0.3)',
+                        color: '#64ffda',
+                        transition: 'all 0.3s ease-in-out',
+                        '&:hover': {
+                          backgroundColor: 'rgba(100, 255, 218, 0.2)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
+                        },
+                      }}
+                    >
+                      Repay Loan
+                    </Button>
+                  </CardContent>
+                </GlassCard>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      </Container>
+    );
   }
 
   return (
-    <Box
-      sx={{
-        overflowY: 'hidden',
-        scrollBehavior: 'smooth',
-      }}
-    >
-      <ActiveLoansContainer>
-        <Box sx={{ width: "100%", mb: 4 }}>
-          <Typography variant="h4" gutterBottom sx={{ 
-            fontFamily: "Yatra One",
-            color: '#E0FAFF',
-            '& span': {
-              background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }
-          }}>
+    <Container>
+      <Box
+        sx={{
+          padding: 3,
+          backgroundColor: "transparent",
+          backdropFilter: "blur(10px)",
+          minHeight: "calc(100vh - 80px)",
+          position: "relative",
+          zIndex: 1,
+          overflowY: 'hidden',
+          scrollBehavior: 'smooth',
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 11,
+            marginBottom: 4
+          }}
+        >
+          <Typography
+            variant="h4"
+            sx={{
+              fontFamily: "Yatra One",
+              color: "#00ffff",
+              textShadow: '0 0 10px rgba(0, 255, 255, 0.3)',
+              '& span': {
+                background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }
+            }}
+          >
             Active Loans (<span>{activeLoans.length}</span>)
           </Typography>
         </Box>
 
-        {activeLoans.map((loan) => (
-          <LoanCard key={loan.loanId}>
-            <StyledCard sx={{ height: "100%" }}>
-              <CardContent>
-                <Box
-                  sx={{
-                    mb: 2,
+        <Grid container spacing={3} sx={{ maxWidth: "1200px", margin: "0 auto" }}>
+          {activeLoans.map((loan) => (
+            <Grid item xs={12} sm={6} md={4} key={loan.loanId}>
+              <GlassCard>
+                <CardContent>
+                  <Box sx={{
                     display: "flex",
-                    justifyContent: "space-between",
                     alignItems: "center",
-                  }}
-                >
-                  <Typography variant="h5" component="div">
-                    Loan #{loan.loanId}
-                  </Typography>
-                  <StatusChip label="ACTIVE" status="active" size="small" />
-                </Box>
+                    marginBottom: 2,
+                  }}>
+                    <Avatar sx={{ 
+                      marginRight: 2,
+                      background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
+                    }} />
+                    <Box>
+                      <Typography variant="h6" sx={{fontFamily:'Yatra One'}}>
+                        Loan #{loan.loanId}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#91C3D0' }}>
+                        {loan.borrowerEthAddress.slice(0, 20)}...
+                        {loan.borrowerEthAddress.slice(-4)}
+                      </Typography>
+                    </Box>
+                  </Box>
 
-                <Divider sx={{ my: 2 }} />
-
-                <Box sx={{ mb: 3 }}>
-                  <LoanInfoItem>
-                    <AccountBalanceIcon color="primary" />
-                    <Typography variant="body1">
-                      <strong>Amount Due:</strong> {loan.loanPayableAmount} ETH
-                    </Typography>
-                  </LoanInfoItem>
-
-                  <LoanInfoItem>
-                    <CalendarTodayIcon color="primary" />
-                    <Typography variant="body1">
-                      <strong>Duration:</strong> {loan.duration} months
-                    </Typography>
-                  </LoanInfoItem>
-
-                  <LoanInfoItem>
-                    <AccessTimeIcon color="primary" />
-                    <Typography variant="body1">
-                      <strong>Created:</strong>{" "}
-                      {new Date(loan.createdAt).toLocaleDateString()}
-                    </Typography>
-                  </LoanInfoItem>
-                </Box>
-
-                <Box
-                  sx={{
+                  <Box sx={{
                     display: "flex",
-                    justifyContent: "space-between",
                     alignItems: "center",
-                    mt: 2,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {localStorage.getItem("walletAddress") ===
-                    loan.lenderEthAddress
-                      ? "You are the lender"
-                      : "You are the borrower"}
-                  </Typography>
+                    marginBottom: 1,
+                  }}>
+                    <AccountBalanceIcon sx={{ marginRight: 1, color: "#64ffda" }} />
+                    <Typography sx={{ color: '#E0FAFF' }}>
+                      {loan.loanPayableAmount} ETH
+                    </Typography>
+                  </Box>
 
-                  {localStorage.getItem("walletAddress") !==
-                  loan.lenderEthAddress ? (
+                  <Box sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 1,
+                  }}>
+                    <CalendarTodayIcon sx={{ marginRight: 1, color: "#64ffda" }} />
+                    <Typography>{loan.duration} months</Typography>
+                  </Box>
+
+                  <Box sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 2,
+                  }}>
+                    <AccessTimeIcon sx={{ marginRight: 1, color: "#64ffda" }} />
+                    <Typography>
+                      Created: {new Date(loan.createdAt).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+
+                  {localStorage.getItem("walletAddress") !== loan.lenderEthAddress ? (
                     <Button
                       variant="contained"
-                      color="primary"
-                      onClick={() =>
-                        repayLoan(loan.loanId, loan.loanPayableAmount)
-                      }
+                      fullWidth
+                      onClick={() => repayLoan(loan.loanId, loan.loanPayableAmount)}
                       sx={{
-                        borderRadius: "20px",
-                        textTransform: "none",
-                        px: 3,
+                        backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                        backdropFilter: 'blur(5px)',
+                        border: '1px solid rgba(100, 255, 218, 0.3)',
+                        color: '#64ffda',
+                        transition: 'all 0.3s ease-in-out',
+                        '&:hover': {
+                          backgroundColor: 'rgba(100, 255, 218, 0.2)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
+                        },
                       }}
                     >
                       Repay Loan
@@ -415,24 +489,31 @@ const ActiveLoans = () => {
                   ) : (
                     <Button
                       variant="contained"
-                      color="primary"
-                      onClick={() =>
-                        claimCollateral(loan.loanId, loan.collateral)
-                      }
+                      fullWidth
+                      onClick={() => claimCollateral(loan.loanId, loan.collateral)}
+                      sx={{
+                        backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                        backdropFilter: 'blur(5px)',
+                        border: '1px solid rgba(100, 255, 218, 0.3)',
+                        color: '#64ffda',
+                        transition: 'all 0.3s ease-in-out',
+                        '&:hover': {
+                          backgroundColor: 'rgba(100, 255, 218, 0.2)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
+                        },
+                      }}
                     >
                       Claim Collateral
                     </Button>
                   )}
-                </Box>
-              </CardContent>
-            </StyledCard>
-          </LoanCard>
-        ))}
-      </ActiveLoansContainer>
-      <Button onClick={() => handleNavClick('targetSection')}>
-        Scroll to Section
-      </Button>
-    </Box>
+                </CardContent>
+              </GlassCard>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Container>
   );
 };
 

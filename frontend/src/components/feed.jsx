@@ -401,15 +401,6 @@ const Feed = () => {
     );
   }
 
-  const dummyLoanRequest = {
-    loanId: "123",
-    borrowerEthAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    loanAmount: 5.5,
-    creditScore: 750,
-    duration: 6,
-    isFunded: false
-  };
-
   return (
     <Container
       sx={{
@@ -466,80 +457,6 @@ const Feed = () => {
 
         {/* Loan Requests Grid */}
         <Grid container spacing={3} sx={{ maxWidth: "1200px", margin: "0 auto", mb: 4 }}>
-          <Grid item xs={12} sm={6} md={4}>
-            <GlassCard>
-              <CardContent>
-                <Box sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: 2,
-                }}>
-                  <Avatar sx={{ 
-                    marginRight: 2,
-                    background: 'linear-gradient(135deg, #9F2BFF 0%, #0085FF 50%, #64ffda 100%)'
-                  }} />
-                  <Box>
-                    <Typography variant="h6">
-                      Loan #{dummyLoanRequest.loanId}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#91C3D0' }}>
-                      {dummyLoanRequest.borrowerEthAddress.slice(0, 20)}...
-                      {dummyLoanRequest.borrowerEthAddress.slice(-4)}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: 1,
-                }}>
-                  <AccountBalanceIcon sx={{ marginRight: 1, color: "#64ffda" }} />
-                  <Typography sx={{ color: '#E0FAFF' }}>
-                    ${dummyLoanRequest.loanAmount.toLocaleString()} ETH
-                  </Typography>
-                </Box>
-
-                <Box sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: 1,
-                }}>
-                  <CreditScoreIcon sx={{ marginRight: 1, color: "#28a745" }} />
-                  <Typography>Credit Score: {dummyLoanRequest.creditScore}</Typography>
-                </Box>
-
-                <Box sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: 2,
-                }}>
-                  <TimerIcon sx={{ marginRight: 1, color: "#dc3545" }} />
-                  <Typography>{dummyLoanRequest.duration} months</Typography>
-                </Box>
-
-                <Button
-                  variant="contained"
-                  fullWidth
-                  onClick={() => handleFundClick(dummyLoanRequest)}
-                  sx={{
-                    backgroundColor: 'rgba(100, 255, 218, 0.1)',
-                    backdropFilter: 'blur(5px)',
-                    border: '1px solid rgba(100, 255, 218, 0.3)',
-                    color: '#64ffda',
-                    transition: 'all 0.3s ease-in-out',
-                    '&:hover': {
-                      backgroundColor: 'rgba(100, 255, 218, 0.2)',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 0 20px rgba(100, 255, 218, 0.2)',
-                    },
-                  }}
-                >
-                  Fund Now
-                </Button>
-              </CardContent>
-            </GlassCard>
-          </Grid>
           {loanRequests.length > 0 ? (
             loanRequests.map((request) => (
               <Grid item xs={12} sm={6} md={4} key={request.loanId}>
