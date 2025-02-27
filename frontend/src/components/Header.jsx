@@ -265,9 +265,11 @@ const Header = () => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     fetchNews();
+    checkLoginStatus();
   }, []);
 
   const fetchNews = async () => {
@@ -306,6 +308,11 @@ const Header = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkLoginStatus = () => {
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
   };
 
   return (
@@ -350,29 +357,30 @@ const Header = () => {
             middlemen, borrowers can access funds instantly with minimal fees.
           </Typography>
 
-          <Box>
-            <StyledButton
-              component={Link}
-              to={"/login"}
-              variant="contained"
-              sx={{
-                mr: 2,
-                px: 4,
-                py: 1,
-                fontSize: "0.9rem",
-                textTransform: "capitalize",
-                borderRadius: 0,
-                borderColor: "#14192d",
-                color: "#fff",
-                backgroundColor: "#14192d",
-                "&&:hover": {
-                  backgroundColor: "#343a55",
-                },
-                "&&:focus": {
-                  backgroundColor: "#343a55",
-                },
-              }}
-            >
+          {!isLoggedIn && (
+            <Box>
+              <StyledButton
+                component={Link}
+                to={"/login"}
+                variant="contained"
+                sx={{
+                  mr: 2,
+                  px: 4,
+                  py: 1,
+                  fontSize: "0.9rem",
+                  textTransform: "capitalize",
+                  borderRadius: 0,
+                  borderColor: "#14192d",
+                  color: "#fff",
+                  backgroundColor: "#14192d",
+                  "&&:hover": {
+                    backgroundColor: "#343a55",
+                  },
+                  "&&:focus": {
+                    backgroundColor: "#343a55",
+                  },
+                }}
+              >
               Log In
             </StyledButton>
             <StyledButton
@@ -400,7 +408,7 @@ const Header = () => {
             >
               Explore
             </StyledButton>
-          </Box>
+          </Box>)}
         </BoxText>
 
         <Box
