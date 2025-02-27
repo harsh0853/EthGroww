@@ -275,6 +275,7 @@ const Header = () => {
   useEffect(() => {
     fetchNews();
     checkLoginStatus();
+    checkLoginStatus();
   }, []);
 
   const fetchNews = async () => {
@@ -313,6 +314,11 @@ const Header = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkLoginStatus = () => {
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
   };
 
   return (
