@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { client } from "../config/redis.js";
+// import { client } from "../config/redis.js";
 import { transporter } from "../config/nodemailer.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -16,10 +16,10 @@ const sendOTPEmail = asyncHandler(async (req, res) => {
   if (!email) throw new ApiError(400, "Email is required");
   console.log("Email:", email);
   const otp = generateNumericOtp(6);
-
-  await client.set(`otp:${email}`, otp, "EX", 600); // "EX" sets expiry to 10 mins
-  const checkOTP = await client.get(`otp:${email}`);
-  console.log("Stored OTP in Redis:", checkOTP);
+  console.log(otp);
+  // await client.set(`otp:${email}`, otp, "EX", 600); // "EX" sets expiry to 10 mins
+  // const checkOTP = await client.get(`otp:${email}`);
+  // console.log("Stored OTP in Redis:", checkOTP);
 
   if (!checkOTP) throw new ApiError(500, "failed to store OTP in Redis");
 
